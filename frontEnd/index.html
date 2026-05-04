@@ -3,40 +3,76 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Encriptador</title>
+  <title>Encriptador — Discretas 2</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
 
   <div class="bg-white rounded-2xl shadow-md p-8 w-full max-w-md">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">Encriptador de Contraseña</h1>
+    <h1 class="text-2xl font-bold text-gray-800 mb-1">Encriptador</h1>
+    <p class="text-xs text-gray-400 mb-6">Matemáticas Discretas 2</p>
 
+    <!-- Método de encriptación -->
     <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-600 mb-1">Método</label>
+      <select id="metodo"
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white">
+        <option value="rsa">RSA</option>
+        <!-- Agrega aquí más métodos cuando los implementes -->
+        <!-- <option value="vigenere">Vigenère</option> -->
+        <!-- <option value="aes">AES</option> -->
+      </select>
+    </div>
+
+    <!-- Estado de claves -->
+    <div class="mb-4 flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-2">
+      <div>
+        <p class="text-xs text-gray-400 mb-0.5">Clave pública (e, n)</p>
+        <p id="info-clave-publica" class="font-mono text-xs text-gray-700">—</p>
+      </div>
+      <span id="estado-claves" class="text-yellow-500 text-xs">Cargando...</span>
+    </div>
+
+    <!-- Contraseña -->
+    <div class="mb-6">
       <label class="block text-sm font-medium text-gray-600 mb-1">Contraseña</label>
       <input id="password" type="text" placeholder="Ingresa tu contraseña"
         class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
     </div>
 
-    <div class="mb-6">
-      <label class="block text-sm font-medium text-gray-600 mb-1">Llave</label>
-      <input id="key" type="text" placeholder="Ingresa la llave"
-        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-    </div>
-
+    <!-- Botón encriptar -->
     <button onclick="encriptar()"
       class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded-lg transition">
       Encriptar
     </button>
 
+    <!-- Resultado encriptado -->
     <div id="resultado" class="hidden mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
-      <p class="text-sm text-gray-500 mb-1">Contraseña encriptada:</p>
-      <p id="resultado-texto" class="font-mono text-gray-800 break-all"></p>
+      <p class="text-xs text-gray-400 mb-1">Texto cifrado:</p>
+      <p id="resultado-texto" class="font-mono text-gray-800 break-all text-xs"></p>
+
+      <!-- Botón desencriptar -->
+      <button onclick="desencriptar()"
+        class="mt-3 w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-1.5 rounded-lg text-sm transition">
+        Desencriptar
+      </button>
     </div>
 
+    <!-- Resultado descifrado -->
+    <div id="resultado-descifrado-container" class="hidden mt-3 bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <p class="text-xs text-gray-400 mb-1">Texto descifrado:</p>
+      <p id="resultado-descifrado" class="font-mono text-gray-800 break-all"></p>
+    </div>
+
+    <!-- Errores -->
     <div id="error" class="hidden mt-4 text-red-500 text-sm text-center"></div>
+
+    <!-- Sección explicación didáctica (implementar más adelante) -->
+    <!-- <div id="explicacion" class="hidden mt-6 border-t pt-4"> -->
+    <!--   Aquí irá la explicación paso a paso con los valores reales -->
+    <!-- </div> -->
   </div>
 
   <script src="./js/script.js"></script>
-
 </body>
 </html>
