@@ -1,0 +1,14 @@
+# Librerías instaladas localmente
+backEnd/cryptography/
+backEnd/cryptography-*/
+backEnd/cffi/
+backEnd/cffi-*/
+backEnd/pycparser/
+backEnd/pycparser-*/
+backEnd/*.dist-info/
+backEnd/*.pyd
+
+# Cache de Python
+backEnd/__pycache__/
+**/__pycache__/
+*.pyc
