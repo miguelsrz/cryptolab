@@ -1,5 +1,15 @@
 from metodos import rsa
-# from metodos import vigenere  ← importa aquí cuando lo implementes
+from metodos import elgamal
+
+# AES requiere la librería 'cryptography'. Se importa con manejo de error
+# para que los otros métodos sigan funcionando si no está instalada.
+try:
+    from metodos import aes
+    _aes_disponible = True
+except ImportError:
+    _aes_disponible = False
+    print("[router] AVISO: 'cryptography' no está instalada. AES no disponible.")
+    print("         Ejecuta: pip install cryptography")
 
 # ─────────────────────────────────────────────
 # Registro de métodos disponibles
@@ -10,9 +20,13 @@ from metodos import rsa
 # ─────────────────────────────────────────────
 
 METODOS = {
-    "rsa": rsa,
+    "rsa":     rsa,
+    "elgamal": elgamal,
     # "vigenere": vigenere,
 }
+
+if _aes_disponible:
+    METODOS["aes"] = aes
 
 def manejar_ruta(ruta: str, body: dict):
     metodo_key = body.get("metodo", "rsa")

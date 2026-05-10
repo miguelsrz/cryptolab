@@ -1,7 +1,7 @@
 import json
 from router import manejar_ruta
  
-ALLOWED_ORIGIN = "https://discretas.miguelsrz.com"
+ALLOWED_ORIGIN = "*"
  
 HEADERS = {
     "Access-Control-Allow-Origin":  ALLOWED_ORIGIN,

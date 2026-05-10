@@ -2,9 +2,9 @@
 metodos/rsa.py
 
 Interfaz estándar que todo método debe cumplir:
-  - generar_claves()            → dict con publica, privada, parametros
-  - encriptar(password, clave)  → dict con encrypted
-  - desencriptar(cifrado, clave)→ dict con decrypted
+  - generar_claves()            → dict con publica, privada, parametros, pasos_claves
+  - encriptar(password, clave)  → dict con encrypted, pasos
+  - desencriptar(cifrado, clave)→ dict con decrypted, pasos
 """
 
 import random
@@ -88,16 +88,59 @@ def generar_claves():
         e += 2
     d = inverso_modular(e, phi)
 
+    pasos_claves = [
+        {
+            "titulo": "Elegir dos primos grandes",
+            "formula": "p, q ∈ ℙ",
+            "detalle": f"Se eligen aleatoriamente dos números primos: p = {p} y q = {q}",
+            "valores": {"p": p, "q": q}
+        },
+        {
+            "titulo": "Calcular el módulo n",
+            "formula": "n = p × q",
+            "detalle": f"n = {p} × {q} = {n}",
+            "valores": {"n": n}
+        },
+        {
+            "titulo": "Calcular la función de Euler φ(n)",
+            "formula": "φ(n) = (p − 1)(q − 1)",
+            "detalle": f"φ({n}) = ({p} − 1) × ({q} − 1) = {p-1} × {q-1} = {phi}",
+            "valores": {"phi": phi}
+        },
+        {
+            "titulo": "Elegir exponente público e",
+            "formula": "1 < e < φ(n),  mcd(e, φ(n)) = 1",
+            "detalle": f"Se busca e tal que sea coprimo con φ(n) = {phi}. Resultado: e = {e}",
+            "valores": {"e": e}
+        },
+        {
+            "titulo": "Calcular clave privada d",
+            "formula": "d ≡ e⁻¹ (mod φ(n))",
+            "detalle": f"d es el inverso modular de e = {e} módulo φ(n) = {phi}. Resultado: d = {d}",
+            "valores": {"d": d}
+        },
+        {
+            "titulo": "Claves generadas",
+            "formula": "Pública: (e, n)  |  Privada: (d, n)",
+            "detalle": f"Clave pública: (e={e}, n={n}) — Clave privada: (d={d}, n={n})",
+            "valores": {"publica": f"(e={e}, n={n})", "privada": f"(d={d}, n={n})"}
+        },
+    ]
+
     return {
-        "publica":    {"e": e, "n": n},
-        "privada":    {"d": d, "n": n},
-        "parametros": {"p": p, "q": q, "phi": phi},
+        "publica":      {"e": e, "n": n},
+        "privada":      {"d": d, "n": n},
+        "parametros":   {"p": p, "q": q, "phi": phi},
+        "pasos_claves": pasos_claves,
     }
+
 
 def encriptar(password: str, clave_publica: dict) -> dict:
     e = int(clave_publica["e"])
     n = int(clave_publica["n"])
     cifrado = []
+    pasos = []
+
     for caracter in password:
         m = ord(caracter)
         if m >= n:
@@ -105,11 +148,35 @@ def encriptar(password: str, clave_publica: dict) -> dict:
                 f"El carácter '{caracter}' (unicode={m}) supera n={n}. "
                 "Genera claves más grandes."
             )
-        cifrado.append(potencia_modular(m, e, n))
-    return {"encrypted": cifrado}
+        c = potencia_modular(m, e, n)
+        cifrado.append(c)
+        pasos.append({
+            "caracter": caracter,
+            "m": m,
+            "formula": f"{m}^{e} mod {n}",
+            "resultado": c,
+            "detalle": f"'{caracter}' → ASCII={m} → {m}^{e} mod {n} = {c}"
+        })
+
+    return {"encrypted": cifrado, "pasos": pasos}
+
 
 def desencriptar(cifrado: list, clave_privada: dict) -> dict:
     d = int(clave_privada["d"])
     n = int(clave_privada["n"])
-    texto = "".join(chr(potencia_modular(c, d, n)) for c in cifrado)
-    return {"decrypted": texto}
+    pasos = []
+    texto = ""
+
+    for c in cifrado:
+        m = potencia_modular(c, d, n)
+        caracter = chr(m)
+        texto += caracter
+        pasos.append({
+            "cifrado": c,
+            "formula": f"{c}^{d} mod {n}",
+            "m": m,
+            "caracter": caracter,
+            "detalle": f"c={c} → {c}^{d} mod {n} = {m} → '{caracter}'"
+        })
+
+    return {"decrypted": texto, "pasos": pasos}
