@@ -20,6 +20,8 @@
       --yellow:     #d29922;
       --yellow-dim: #2d2008;
       --red:        #f85149;
+      --purple:     #d2a8ff;
+      --purple-dim: #2d1f47;
       --text:       #e6edf3;
       --muted:      #8b949e;
       --mono:       'JetBrains Mono', monospace;
@@ -357,10 +359,32 @@
     .step-item.open .step-body { display: block; }
 
     .step-detail {
-      font-size: .8rem;
-      color: var(--muted);
-      line-height: 1.6;
+      font-size: .82rem;
+      color: var(--text);
+      line-height: 1.7;
       margin-bottom: .6rem;
+    }
+    .step-detail p { margin-bottom: .65rem; }
+    .step-detail p:last-child { margin-bottom: 0; }
+    .step-detail b, .step-detail strong {
+      color: var(--purple);
+      font-weight: 700;
+    }
+    .step-detail .hl {
+      color: var(--yellow);
+      font-weight: 700;
+    }
+    .step-detail .hl-green {
+      color: var(--green);
+      font-weight: 700;
+    }
+    .step-detail code {
+      font-family: var(--mono);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: .05rem .35rem;
+      color: var(--accent);
     }
     .step-values {
       display: flex;
@@ -415,6 +439,103 @@
       animation: spin .7s linear infinite;
       flex-shrink: 0;
     }
+    /* video embed (Teoría) */
+    .video-embed {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-top: .5rem;
+    }
+    .video-embed iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: 0;
+    }
+    .video-caption {
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: .4rem;
+    }
+
+    /* interactive widgets */
+    .interactive-box {
+      background: var(--surface);
+      border: 1px solid var(--purple);
+      border-radius: 8px;
+      padding: .9rem;
+      margin-top: .75rem;
+    }
+    .interactive-box .interactive-label {
+      font-size: .68rem;
+      font-weight: 700;
+      color: var(--purple);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: .6rem;
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+    }
+    .interactive-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      align-items: center;
+      margin-bottom: .6rem;
+    }
+    .interactive-row label {
+      font-size: .7rem;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column;
+      gap: .25rem;
+    }
+    .interactive-box input[type="number"],
+    .interactive-box input[type="text"] {
+      width: 90px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: .4rem .5rem;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: .78rem;
+    }
+    .interactive-box input[type="text"].char-input { width: 50px; text-align: center; }
+    .btn-interactive {
+      background: var(--purple-dim);
+      border: 1px solid var(--purple);
+      color: var(--purple);
+      border-radius: 6px;
+      padding: .4rem .8rem;
+      font-family: var(--sans);
+      font-size: .75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .btn-interactive:hover { background: var(--purple); color: #000; }
+    .interactive-result {
+      margin-top: .6rem;
+      font-size: .78rem;
+    }
+    .interactive-note {
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: .5rem;
+      line-height: 1.5;
+    }
+    .reveal-step {
+      display: inline-block;
+      opacity: .35;
+      transition: opacity .3s;
+    }
+    .reveal-step.revealed { opacity: 1; }
   </style>
 </head>
 <body>
@@ -447,6 +568,10 @@
         </div>
         <span id="estado-claves" class="badge badge-loading">Cargando…</span>
       </div>
+
+      <button id="btn-generar-claves" class="btn btn-secondary" onclick="cargarClaves()">
+        Generar nuevas claves
+      </button>
 
       <!-- Contraseña -->
       <div class="field">
@@ -485,7 +610,8 @@
       <div class="steps-header">
         <h2>Paso a paso</h2>
         <div class="tab-group">
-          <button class="tab active" id="tab-claves"   onclick="cambiarTab('claves')">Claves</button>
+          <button class="tab active"        id="tab-teoria"   onclick="cambiarTab('teoria')">Teoría</button>
+          <button class="tab" id="tab-claves"   onclick="cambiarTab('claves')">Claves</button>
           <button class="tab"        id="tab-cifrado"  onclick="cambiarTab('cifrado')">Cifrado</button>
           <button class="tab"        id="tab-descifrado" onclick="cambiarTab('descifrado')">Descifrado</button>
         </div>

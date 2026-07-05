@@ -89,39 +89,120 @@ def generar_claves() -> dict:
     x = random.randint(2, p - 2)
     y = potencia_modular(g, x, p)
 
+    phi = p - 1  # orden del grupo (ℤ/pℤ)*
+
     pasos_claves = [
         {
-            "titulo": "Elegir un primo grande p",
-            "formula": "p ∈ ℙ",
-            "detalle": f"Se elige aleatoriamente el primo p = {p}. Este es el módulo del grupo cíclico.",
-            "valores": {"p": p}
+            "titulo": "El campo finito 𝔽ₚ y su grupo multiplicativo",
+            "formula": "𝔽ₚ = ℤ/pℤ  →  (ℤ/pℤ)* = {1, 2, ..., p−1}",
+            "detalle": (
+                "<p class='step-detail'>ElGamal no trabaja sobre todo el campo finito 𝔽ₚ, "
+                "sino sobre el grupo que forman sus elementos distintos de cero bajo la "
+                "multiplicación módulo p: <span class='hl'>(ℤ/pℤ)*</span>.</p>"
+                "<p class='step-detail'>Como p es primo, todo elemento de 1 a p−1 es coprimo "
+                "con p, así que ninguno se pierde al multiplicar: el conjunto es "
+                "<b>cerrado</b> bajo esta operación. Este conjunto con la multiplicación mod p "
+                "es el grupo sobre el que se construye toda la seguridad del esquema.</p>"
+            ),
+            "valores": {}
         },
         {
-            "titulo": "Encontrar un generador g",
-            "formula": "g es raíz primitiva mod p",
+            "titulo": "Verificación de los axiomas de grupo",
+            "formula": "(G, ·) es grupo ⟺ cierre, asociatividad, neutro, inversos",
             "detalle": (
-                f"Se busca g tal que genere todo el grupo (ℤ/pℤ)*. "
-                f"Esto significa que g^k mod p recorre todos los valores 1..{p-1}. "
-                f"Generador encontrado: g = {g}"
+                "<p class='step-detail'>Para que (ℤ/pℤ)* sea formalmente un <b>grupo</b> bajo "
+                "· (multiplicación mod p) deben cumplirse cuatro propiedades:</p>"
+                "<p class='step-detail'>"
+                "<span class='hl-green'>1. Cierre:</span> a·b mod p siempre cae de nuevo en {1,...,p−1}."
+                "<br/><span class='hl-green'>2. Asociatividad:</span> (a·b)·c ≡ a·(b·c) (mod p), heredada de ℤ."
+                "<br/><span class='hl-green'>3. Elemento neutro:</span> existe 1 tal que a·1 ≡ a (mod p)."
+                "<br/><span class='hl-green'>4. Inversos:</span> para todo a existe un único a⁻¹ tal que "
+                "a·a⁻¹ ≡ 1 (mod p), garantizado por el <b>Pequeño Teorema de Fermat</b>: a^(p−2) ≡ a⁻¹."
+                "</p>"
+                "<p class='step-detail'>Al cumplirse las cuatro, (ℤ/pℤ)* es un <b>grupo abeliano finito</b> "
+                "— la estructura algebraica exacta que ElGamal necesita para que cifrar y descifrar "
+                "sean operaciones inversas bien definidas.</p>"
+            ),
+            "valores": {}
+        },
+        {
+            "titulo": "Elegir un primo grande p (orden del grupo)",
+            "formula": "p ∈ ℙ  →  |(ℤ/pℤ)*| = p − 1",
+            "detalle": (
+                f"<p class='step-detail'>Se elige aleatoriamente el primo <b style='color:var(--purple)'>p = {p}</b>. "
+                f"Este primo define el módulo del grupo y, de paso, su orden (cardinalidad): "
+                f"<span class='hl'>|(ℤ/pℤ)*| = p − 1 = {phi}</span> elementos.</p>"
+                f"<p class='step-detail'>Todo lo que sigue (generador, exponentes, dificultad del "
+                f"ataque) depende de este valor.</p>"
+            ),
+            "valores": {"p": p, "orden_grupo": phi}
+        },
+        {
+            "titulo": "Grupo cíclico y elemento generador",
+            "formula": "(ℤ/pℤ)* es cíclico  ⟺  ∃ g : ⟨g⟩ = (ℤ/pℤ)*",
+            "detalle": (
+                "<p class='step-detail'>Un resultado clásico de teoría de grupos garantiza que "
+                "(ℤ/pℤ)* es siempre <b>cíclico</b>: existe al menos un elemento g, llamado "
+                "<span class='hl'>generador o raíz primitiva</span>, cuyas potencias "
+                "g¹, g², g³, ..., g^(p−1) recorren TODOS los elementos de {1, ..., p−1} sin "
+                "repetir antes de volver a 1.</p>"
+                "<p class='step-detail'>Ese subconjunto generado por g, denotado ⟨g⟩, coincide "
+                "con todo el grupo. Trabajar sobre un grupo cíclico es lo que permite parametrizar "
+                "cada elemento como una potencia de g, que es exactamente la base del logaritmo "
+                "discreto.</p>"
+            ),
+            "valores": {}
+        },
+        {
+            "titulo": "Encontrar un generador g (raíz primitiva) — Teorema de Lagrange",
+            "formula": "g es generador  ⟺  g^(φ/q) ≠ 1 (mod p)  ∀ primo q | φ",
+            "detalle": (
+                f"<p class='step-detail'>Buscar un generador exhaustivamente (probando el orden "
+                f"real de cada candidato) sería costoso. En su lugar se usa el "
+                f"<b>Teorema de Lagrange</b>: en un grupo finito, el orden de cualquier elemento "
+                f"debe dividir al orden del grupo, <span class='hl'>φ = p−1 = {phi}</span>.</p>"
+                f"<p class='step-detail'>Por lo tanto, si g NO genera todo el grupo, su orden es "
+                f"necesariamente un divisor propio de φ, expresable como φ/q para algún primo q "
+                f"que divide a φ. Basta factorizar φ y verificar que g^(φ/q) ≠ 1 (mod p) para cada "
+                f"uno: si ninguna potencia colapsa a 1, g genera todo el grupo. "
+                f"Generador encontrado: <b style='color:var(--purple)'>g = {g}</b>.</p>"
             ),
             "valores": {"g": g}
         },
         {
-            "titulo": "Elegir clave privada x",
-            "formula": "x ∈ [2, p−2]  (secreto)",
-            "detalle": f"Se elige aleatoriamente el entero secreto x = {x}. Solo el receptor lo conoce.",
+            "titulo": "Elegir clave privada x — el Problema del Logaritmo Discreto",
+            "formula": "x ∈ [2, p−2]  (secreto, uniformemente aleatorio)",
+            "detalle": (
+                f"<p class='step-detail'>Se elige aleatoriamente el entero secreto "
+                f"<b style='color:var(--purple)'>x = {x}</b>: el exponente que solo conoce el "
+                f"receptor. Su seguridad no depende de ocultar un algoritmo, sino de una "
+                f"asimetría computacional real.</p>"
+                f"<p class='step-detail'>Calcular y = gˣ mod p es rápido (exponenciación modular, "
+                f"O(log x) multiplicaciones), pero recuperar x conociendo únicamente g, p y y "
+                f"—el <span class='hl'>Problema del Logaritmo Discreto (PLD)</span>— no tiene un "
+                f"algoritmo eficiente conocido para p grande. Toda la seguridad de ElGamal se "
+                f"reduce, en última instancia, a la dificultad de este problema sobre el grupo "
+                f"cíclico (ℤ/pℤ)*.</p>"
+            ),
             "valores": {"x": x}
         },
         {
             "titulo": "Calcular clave pública y",
             "formula": "y = g^x mod p",
-            "detalle": f"y = {g}^{x} mod {p} = {y}. Este valor es público.",
+            "detalle": (
+                f"<p class='step-detail'>y = {g}<sup>{x}</sup> mod {p} = "
+                f"<b style='color:var(--purple)'>{y}</b>. Este valor es "
+                f"<span class='hl-green'>público</span>.</p>"
+            ),
             "valores": {"y": y}
         },
         {
             "titulo": "Claves generadas",
             "formula": "Pública: (p, g, y)  |  Privada: (p, x)",
-            "detalle": f"Clave pública: (p={p}, g={g}, y={y}) — Clave privada: (p={p}, x={x})",
+            "detalle": (
+                f"<p class='step-detail'>Clave <span class='hl-green'>pública</span>: "
+                f"(p={p}, g={g}, y={y}) — Clave <span class='hl'>privada</span>: (p={p}, x={x})</p>"
+            ),
             "valores": {"publica": f"(p={p}, g={g}, y={y})", "privada": f"(p={p}, x={x})"}
         },
     ]
@@ -166,9 +247,17 @@ def encriptar(password: str, clave_publica: dict) -> dict:
             "c2_formula": f"{m} × {yk} mod {p}",
             "c2": c2,
             "detalle": (
-                f"'{caracter}' → m={m}, k={k} aleatorio | "
-                f"c1 = {g}^{k} mod {p} = {c1} | "
-                f"c2 = {m} × {y}^{k} mod {p} = {m} × {yk} mod {p} = {c2}"
+                f"'{caracter}' → m={m} (código ASCII, el elemento del grupo a cifrar). "
+                f"Se elige un k efímero distinto para CADA carácter (k={k}), lo que hace que "
+                f"el mismo carácter repetido en el mensaje produzca pares (c₁, c₂) distintos: "
+                f"esta es la propiedad probabilística de ElGamal. "
+                f"c₁ = g^k mod p = {g}^{k} mod {p} = {c1} actúa como la 'huella pública' del "
+                f"secreto efímero k, expresada dentro del mismo grupo cíclico. "
+                f"El secreto compartido efímero es y^k mod p = {y}^{k} mod {p} = {yk} "
+                f"(nótese que y^k = (g^x)^k = (g^k)^x = c1^x — esta igualdad es la que permite "
+                f"reconstruir y^k en el descifrado sin conocer k). "
+                f"Finalmente c₂ = m × y^k mod p = {m} × {yk} mod {p} = {c2} 'enmascara' el "
+                f"mensaje multiplicándolo por ese secreto compartido dentro del grupo."
             )
         })
 
@@ -197,10 +286,19 @@ def desencriptar(cifrado: list, clave_privada: dict) -> dict:
             "m": m,
             "caracter": caracter,
             "detalle": (
-                f"c1={c1}, c2={c2} | "
-                f"s = {c1}^{x} mod {p} = {s} | "
-                f"s⁻¹ = {s_inv} | "
-                f"m = {c2} × {s_inv} mod {p} = {m} → '{caracter}'"
+                f"Paso 1 — Reconstruir el secreto compartido sin conocer k: "
+                f"s = c₁ˣ mod p = {c1}^{x} mod {p} = {s}. "
+                f"Esto funciona porque c₁ = gᵏ, entonces c₁ˣ = (gᵏ)ˣ = (gˣ)ᵏ = yᵏ: "
+                f"el receptor llega al mismo valor y^k que usó quien cifró, solo que aplicando "
+                f"su exponente secreto x sobre c₁ en vez de aplicar k sobre y. "
+                f"Paso 2 — Invertir el secreto compartido dentro del grupo (ℤ/pℤ)*: "
+                f"como todo elemento del grupo tiene inverso multiplicativo único, se calcula "
+                f"s⁻¹ = {s_inv} (aquí, vía Fermat: s^(p−2) mod p). "
+                f"Paso 3 — Cancelar el enmascaramiento: "
+                f"m = c₂ × s⁻¹ mod p = {c2} × {s_inv} mod {p} = {m}. "
+                f"Como c₂ = m × yᵏ, al multiplicar por (yᵏ)⁻¹ el factor se cancela algebraicamente "
+                f"(yᵏ × (yᵏ)⁻¹ ≡ 1) y queda expuesto el mensaje original m, que corresponde al "
+                f"carácter '{caracter}'."
             )
         })
 
