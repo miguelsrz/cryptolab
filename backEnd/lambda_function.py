@@ -24,7 +24,7 @@ def lambda_handler(event, context):
     #   /pruebarsa/api/encriptar  → /encriptar
     #   /api/encriptar            → /encriptar
     #   /encriptar                → /encriptar
-    for segmento in ["/claves", "/encriptar", "/desencriptar"]:
+    for segmento in ["/claves", "/encriptar", "/desencriptar", "/reloj"]:
         if ruta.endswith(segmento):
             ruta = segmento
             break

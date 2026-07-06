@@ -1,5 +1,6 @@
 from metodos import rsa
 from metodos import elgamal
+from metodos import reloj_modular
 
 # AES requiere la librería 'cryptography'. Se importa con manejo de error
 # para que los otros métodos sigan funcionando si no está instalada.
@@ -54,5 +55,11 @@ def manejar_ruta(ruta: str, body: dict):
             raise ValueError("El campo 'cifrado' es requerido")
         clave_privada = body.get("clave_privada", {})
         return metodo.desencriptar(cifrado, clave_privada)
+
+    if ruta == "/reloj":
+        # Ruta exclusiva de ElGamal: arma los datos del reloj modular
+        # (grupo cíclico + generador) para que el frontend los dibuje.
+        # No depende de METODOS/metodo_key porque solo aplica a ElGamal.
+        return reloj_modular.generar_datos_reloj(body)
 
     raise ValueError(f"Ruta '{ruta}' no encontrada")

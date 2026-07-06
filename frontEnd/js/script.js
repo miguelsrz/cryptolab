@@ -4,7 +4,7 @@ const API_BASE = "/api";
 // Estado de la sesión
 // ─────────────────────────────────────────────
 const sesion = {
-  metodo:        "rsa",
+  metodo:        "elgamal",
   clave_publica: null,
   clave_privada: null,
   parametros:    null,
@@ -14,6 +14,7 @@ const sesion = {
   pasos_descifrado: null,
   texto_plano:      null, // texto que el usuario cifró por última vez
   texto_descifrado: null, // texto recuperado en el último descifrado
+  relojPuntosCifrado: [], // puntos (m, c1, yk, c2) acumulados para el reloj real
 };
 
 // Tab activa
@@ -35,6 +36,9 @@ document.addEventListener("DOMContentLoaded", () => {
     sesion.pasos_descifrado = null;
     sesion.texto_plano      = null;
     sesion.texto_descifrado = null;
+    sesion.relojPuntosCifrado = [];
+    relojCifradoModo   = "paso";
+    relojCifradoIndice = -1;
 
     document.getElementById("resultado").classList.remove("visible");
     document.getElementById("resultado-descifrado-container").classList.remove("visible");
@@ -65,6 +69,9 @@ async function cargarClaves() {
   sesion.pasos_descifrado  = null;
   sesion.texto_plano       = null;
   sesion.texto_descifrado  = null;
+  sesion.relojPuntosCifrado = [];
+  relojCifradoModo   = "paso";
+  relojCifradoIndice = -1;
   document.getElementById("resultado").classList.remove("visible");
   document.getElementById("resultado-descifrado-container").classList.remove("visible");
   document.getElementById("error").classList.remove("visible");
@@ -220,7 +227,6 @@ function cambiarTab(tab) {
 
 // ID del video de YouTube a mostrar en la teoría de ElGamal.
 // "Píldora formativa 42: ¿Cómo funciona el algoritmo de ElGamal?" (UPM / Thoth).
-// Cámbialo aquí si el equipo decide usar otro video.
 const YOUTUBE_RSA_ID = "CMe0COxZxb0";
 const YOUTUBE_AES_ID = "tzj1RoqRnv0";
 const YOUTUBE_ELGAMAL_ID = "N3ANaOi9gAc";
@@ -670,6 +676,41 @@ function renderPasosClaves(pasos) {
     `,
   }));
 
+  // Reloj modular didáctico: se inyecta dentro del paso que ya explica
+  // "grupo cíclico / generador" (viene del backend), en vez de crear un
+  // paso nuevo — es el lugar donde el concepto se explica en teoría.
+  if (sesion.metodo === "elgamal") {
+    const pasoGrupo = items.find(
+      (it) => it.titulo && (it.titulo.includes("Grupo cíclico") || it.titulo.includes("generador"))
+    );
+    if (pasoGrupo) {
+      pasoGrupo.body += `
+        <div class="reloj-wrap">
+          <div class="reloj-toggle-row">
+            <button class="btn-interactive" id="reloj-didactico-toggle" onclick="toggleRelojDidactico()">
+              Ver en el reloj modular ↗
+            </button>
+          </div>
+          <div class="reloj-svg-container" id="reloj-didactico-container">
+            <div id="reloj-didactico-svg"></div>
+            <div class="reloj-toggle-row" style="justify-content:flex-start; margin-top:.6rem;">
+              <button class="btn-interactive" id="reloj-didactico-btn-play" onclick="animarOrbitaDidactica()">
+                ▶ Recorrer la órbita de g
+              </button>
+              <button class="btn-interactive" onclick="toggleRelojDidactico(true)">
+                🔁 Otro grupo (p distinto)
+              </button>
+            </div>
+            <p class="reloj-caption" id="reloj-didactico-caption">
+              Cada punto del reloj es un elemento de (ℤ/pℤ)*. Pulsa "Recorrer la órbita" para
+              ver cómo <b>g</b> visita cada posición, una a una, antes de volver a 1.
+            </p>
+          </div>
+        </div>
+      `;
+    }
+  }
+
   // Widget interactivo adicional solo para ElGamal: calculadora de
   // exponenciación modular rápida (cuadrado y multiplicación), prellenada
   // con los valores reales de la sesión (g, x, p).
@@ -836,6 +877,41 @@ function renderPasosCifrado(pasos, metodo) {
               <tbody id="simk-tabla-body"></tbody>
             </table>
             <p class="interactive-note" id="simk-nota"></p>
+
+            <div class="reloj-wrap">
+              <div class="reloj-toggle-row">
+                <button class="btn-interactive" id="reloj-cifrado-toggle" onclick="toggleRelojCifrado()">
+                  Ver cifrado en el reloj ↗
+                </button>
+              </div>
+              <div class="reloj-svg-container" id="reloj-cifrado-container">
+                <p class="reloj-caption" style="margin-top:0;">
+                  Grupo <b>(ℤ/${pPub}ℤ)*</b> — el reloj representa este grupo cíclico completo
+                  (p=${pPub} posiciones), aunque solo se marcan los puntos de los caracteres
+                  que cifres.
+                </p>
+                <div id="reloj-cifrado-svg"></div>
+                <div class="reloj-legend" id="reloj-cifrado-legend"></div>
+                <div class="reloj-toggle-row" style="justify-content:space-between; margin-top:.7rem;">
+                  <div>
+                    <button class="btn-interactive" id="reloj-cifrado-btn-prev" onclick="navegarRelojCifrado(-1)">◀ Anterior</button>
+                    <button class="btn-interactive" id="reloj-cifrado-btn-next" onclick="navegarRelojCifrado(1)">Siguiente ▶</button>
+                  </div>
+                  <button class="btn-interactive" id="reloj-cifrado-btn-modo" onclick="alternarModoRelojCifrado()">
+                    Ver todos juntos
+                  </button>
+                </div>
+                <p class="interactive-note" id="reloj-cifrado-contador"></p>
+                <p class="reloj-caption">
+                  <b>Paso a paso:</b> muestra un carácter a la vez con sus 4 puntos — m (mensaje),
+                  c₁ (huella de k), yᵏ (secreto compartido) y c₂ (con borde, el resultado) — y las
+                  líneas punteadas que conectan m y yᵏ con c₂, mostrando visualmente la operación
+                  <b>c₂ = m · yᵏ mod p</b>. <b>Ver todos juntos:</b> oculta ese detalle y solo marca
+                  el c₂ final de cada carácter cifrado, para ver de un vistazo cómo se distribuye
+                  todo el texto cifrado sobre el reloj.
+                </p>
+              </div>
+            </div>
           </div>
         `,
       },
@@ -1226,6 +1302,9 @@ function simularCifradoK() {
 
   nota.innerHTML = `Carácter <b>'${escapar(caracter)}'</b> (m=${m}) cifrado con k=${k} nuevo.
     Vuelve a cifrar el mismo carácter y compara: el par (c₁, c₂) cambiará cada vez.`;
+
+  sesion.relojPuntosCifrado.push({ caracter, m, k, c1, yk, c2 });
+  renderRelojCifrado();
 }
 
 function limpiarSimuladorCifrado() {
@@ -1235,6 +1314,352 @@ function limpiarSimuladorCifrado() {
   if (tbody) tbody.innerHTML = "";
   if (tabla) tabla.style.display = "none";
   if (nota)  nota.textContent = "";
+
+  sesion.relojPuntosCifrado = [];
+  relojCifradoModo   = "paso";
+  relojCifradoIndice = -1;
+  renderRelojCifrado();
+}
+
+// ─────────────────────────────────────────────
+// RELOJ MODULAR (ElGamal)
+// Todo el cálculo se hace en el cliente reutilizando potenciaModularJS,
+// igual que el resto de simuladores de este archivo — sin llamar a /reloj.
+// ─────────────────────────────────────────────
+
+function esPrimoJS(n) {
+  if (n < 2) return false;
+  if (n === 2) return true;
+  if (n % 2 === 0) return false;
+  for (let i = 3; i * i <= n; i += 2) if (n % i === 0) return false;
+  return true;
+}
+
+function encontrarGeneradorJS(p) {
+  const phi = p - 1;
+  let temp = phi;
+  const factores = new Set();
+  let d = 2;
+  while (d * d <= temp) {
+    while (temp % d === 0) { factores.add(d); temp = Math.floor(temp / d); }
+    d++;
+  }
+  if (temp > 1) factores.add(temp);
+
+  for (let g = 2; g < p; g++) {
+    let generador = true;
+    for (const q of factores) {
+      if (potenciaModularJS(g, Math.floor(phi / q), p) === 1) { generador = false; break; }
+    }
+    if (generador) return g;
+  }
+  return 2;
+}
+
+// Convierte una posición 1..moduloVisual en un ángulo en grados,
+// empezando arriba (12 en punto) y avanzando en sentido horario.
+function anguloParaJS(posicion, moduloVisual) {
+  const fraccion = (((posicion % moduloVisual) + moduloVisual) % moduloVisual) / moduloVisual;
+  return fraccion * 360 - 90;
+}
+
+function puntoEnCirculoJS(anguloGrados, cx, cy, radio) {
+  const rad = (anguloGrados * Math.PI) / 180;
+  return { x: cx + radio * Math.cos(rad), y: cy + radio * Math.sin(rad) };
+}
+
+// ── Reloj didáctico (pestaña Claves) ──────────────────────────────
+// Grupo pequeño (p entre 11 y 30) generado solo para fines visuales,
+// igual que reloj_modular.py hace en el backend.
+function construirRelojDidacticoJS() {
+  const candidatos = [];
+  for (let n = 11; n <= 30; n++) if (esPrimoJS(n)) candidatos.push(n);
+  const p = candidatos[Math.floor(Math.random() * candidatos.length)];
+  const phi = p - 1;
+  const g = encontrarGeneradorJS(p);
+
+  const orbita = [];
+  let valor = 1;
+  for (let paso = 1; paso <= phi; paso++) {
+    valor = (valor * g) % p;
+    orbita.push({ paso, valor });
+  }
+  return { p, phi, g, orbita };
+}
+
+function renderizarRelojDidactico(clock) {
+  const size = 260, c = size / 2, r = size / 2 - 34;
+  const { p, orbita } = clock;
+
+  // Todas las posiciones del grupo, como marcas de fondo
+  const marcas = [];
+  for (let v = 1; v < p; v++) {
+    const pt = puntoEnCirculoJS(anguloParaJS(v, p), c, c, r);
+    marcas.push(`<circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="3" fill="var(--border)" />`);
+  }
+
+  const puntosOrbita = orbita.map((o) => {
+    const pt = puntoEnCirculoJS(anguloParaJS(o.valor, p), c, c, r);
+    return { ...o, x: pt.x, y: pt.y };
+  });
+
+  let segmentos = "";
+  for (let i = 1; i < puntosOrbita.length; i++) {
+    const prev = puntosOrbita[i - 1], cur = puntosOrbita[i];
+    segmentos += `<line id="orb-seg-${i}" x1="${prev.x.toFixed(1)}" y1="${prev.y.toFixed(1)}" x2="${cur.x.toFixed(1)}" y2="${cur.y.toFixed(1)}" stroke="var(--purple)" stroke-width="1.5" opacity="0" />`;
+  }
+
+  const puntosHtml = puntosOrbita.map((pt, i) => `
+    <circle id="orb-pt-${i}" cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="5"
+      fill="var(--surface)" stroke="var(--purple)" stroke-width="1.5" opacity="0" />
+  `).join("");
+
+  return `
+    <svg viewBox="0 0 ${size} ${size}" width="100%" height="260" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--border)" stroke-width="1.5" />
+      ${marcas.join("")}
+      ${segmentos}
+      ${puntosHtml}
+    </svg>
+  `;
+}
+
+let _relojDidacticoActual = null;
+
+function toggleRelojDidactico(forzarNuevo) {
+  const cont = document.getElementById("reloj-didactico-container");
+  const btn  = document.getElementById("reloj-didactico-toggle");
+  if (!cont) return;
+
+  const yaAbierto = cont.classList.contains("visible");
+
+  if (forzarNuevo === true) {
+    _relojDidacticoActual = construirRelojDidacticoJS();
+    document.getElementById("reloj-didactico-svg").innerHTML = renderizarRelojDidactico(_relojDidacticoActual);
+    reiniciarCaptionDidactico();
+    if (!yaAbierto) { cont.classList.add("visible"); if (btn) btn.textContent = "Ocultar reloj modular"; }
+    return;
+  }
+
+  cont.classList.toggle("visible");
+  const abierto = cont.classList.contains("visible");
+  if (btn) btn.textContent = abierto ? "Ocultar reloj modular" : "Ver en el reloj modular ↗";
+
+  if (abierto) {
+    _relojDidacticoActual = construirRelojDidacticoJS();
+    document.getElementById("reloj-didactico-svg").innerHTML = renderizarRelojDidactico(_relojDidacticoActual);
+    reiniciarCaptionDidactico();
+  }
+}
+
+function reiniciarCaptionDidactico() {
+  const caption = document.getElementById("reloj-didactico-caption");
+  const btnPlay = document.getElementById("reloj-didactico-btn-play");
+  if (caption) {
+    caption.innerHTML = `Cada punto del reloj es un elemento de (ℤ/${_relojDidacticoActual.p}ℤ)*.
+      Pulsa "Recorrer la órbita" para ver cómo <b>g=${_relojDidacticoActual.g}</b> visita cada
+      posición, una a una, antes de volver a 1.`;
+  }
+  if (btnPlay) { btnPlay.disabled = false; btnPlay.textContent = "▶ Recorrer la órbita de g"; }
+}
+
+function animarOrbitaDidactica() {
+  const clock = _relojDidacticoActual;
+  if (!clock) return;
+  const btn = document.getElementById("reloj-didactico-btn-play");
+  const caption = document.getElementById("reloj-didactico-caption");
+
+  document.querySelectorAll('[id^="orb-pt-"]').forEach((el) => el.setAttribute("opacity", "0"));
+  document.querySelectorAll('[id^="orb-seg-"]').forEach((el) => el.setAttribute("opacity", "0"));
+  if (btn) btn.disabled = true;
+
+  let i = 0;
+  const total = clock.orbita.length;
+
+  function paso() {
+    if (i >= total) {
+      if (btn) { btn.disabled = false; btn.textContent = "↺ Repetir recorrido"; }
+      if (caption) {
+        caption.innerHTML = `g=${clock.g} recorrió las <b>${clock.phi}</b> posiciones del reloj
+          sin repetir ninguna antes de volver a 1: eso confirma que es una raíz primitiva
+          (generador) de (ℤ/${clock.p}ℤ)*.`;
+      }
+      return;
+    }
+    const pt = document.getElementById(`orb-pt-${i}`);
+    if (pt) pt.setAttribute("opacity", "1");
+    if (i > 0) {
+      const seg = document.getElementById(`orb-seg-${i}`);
+      if (seg) seg.setAttribute("opacity", ".85");
+    }
+    if (caption) {
+      caption.innerHTML = `Paso ${i + 1}: g<sup>${i + 1}</sup> mod ${clock.p} =
+        <b>${clock.orbita[i].valor}</b>`;
+    }
+    i++;
+    setTimeout(paso, 420);
+  }
+  paso();
+}
+
+// ── Cifrado en el reloj (pestaña Cifrado) ─────────────────────────
+// Muestra los puntos (m, c1, yk, c2) de cada carácter cifrado con el
+// simulador de re-cifrado, conectados con líneas que muestran
+// c₂ = m · yᵏ mod p. Dos modos:
+//   - "paso": un carácter a la vez, navegable con ◀ Anterior / Siguiente ▶
+//   - "todos": todos los caracteres cifrados hasta ahora, superpuestos
+const PALETA_RELOJ_CIFRADO = ["var(--accent)", "var(--yellow)", "var(--green)", "var(--purple)", "var(--red)"];
+
+let relojCifradoModo   = "paso"; // "paso" | "todos"
+let relojCifradoIndice = -1;     // índice del carácter mostrado en modo "paso"
+
+function _puntoCifradoSvg(p, c, r, pc, color, radioM = 5) {
+  const ptM  = puntoEnCirculoJS(anguloParaJS(pc.m,  p), c, c, r);
+  const ptC1 = puntoEnCirculoJS(anguloParaJS(pc.c1, p), c, c, r);
+  const ptYk = puntoEnCirculoJS(anguloParaJS(pc.yk, p), c, c, r);
+  const ptC2 = puntoEnCirculoJS(anguloParaJS(pc.c2, p), c, c, r);
+
+  const lineas = `
+    <line x1="${ptM.x.toFixed(1)}"  y1="${ptM.y.toFixed(1)}"  x2="${ptC2.x.toFixed(1)}" y2="${ptC2.y.toFixed(1)}" stroke="${color}" stroke-width="1.3" stroke-dasharray="3 3" opacity=".7" />
+    <line x1="${ptYk.x.toFixed(1)}" y1="${ptYk.y.toFixed(1)}" x2="${ptC2.x.toFixed(1)}" y2="${ptC2.y.toFixed(1)}" stroke="${color}" stroke-width="1.3" stroke-dasharray="3 3" opacity=".7" />
+  `;
+  const puntos = `
+    <circle cx="${ptC1.x.toFixed(1)}" cy="${ptC1.y.toFixed(1)}" r="3" fill="${color}" opacity=".55"><title>c₁=${pc.c1}</title></circle>
+    <circle cx="${ptYk.x.toFixed(1)}" cy="${ptYk.y.toFixed(1)}" r="3.5" fill="${color}" opacity=".8"><title>yᵏ=${pc.yk}</title></circle>
+    <circle cx="${ptC2.x.toFixed(1)}" cy="${ptC2.y.toFixed(1)}" r="5" fill="${color}" stroke="var(--text)" stroke-width="1"><title>c₂=${pc.c2}</title></circle>
+    <circle cx="${ptM.x.toFixed(1)}"  cy="${ptM.y.toFixed(1)}"  r="${radioM}" fill="${color}"><title>'${escapar(pc.caracter)}' → m=${pc.m}</title></circle>
+    <text x="${ptM.x.toFixed(1)}" y="${(ptM.y - 9).toFixed(1)}" font-size="10" fill="${color}" text-anchor="middle" font-weight="700">${escapar(pc.caracter)}</text>
+  `;
+  return lineas + puntos;
+}
+
+// Modo "todos": solo se dibuja el punto final c₂ de cada carácter (sin
+// m/c1/yk ni líneas), para ver de un vistazo dónde cayó cada resultado
+// cifrado sobre el reloj, sin saturar el dibujo con 4 puntos x carácter.
+function _puntoC2Svg(p, c, r, pc, color) {
+  const ptC2 = puntoEnCirculoJS(anguloParaJS(pc.c2, p), c, c, r);
+  return `
+    <circle cx="${ptC2.x.toFixed(1)}" cy="${ptC2.y.toFixed(1)}" r="5.5" fill="${color}" stroke="var(--text)" stroke-width="1">
+      <title>'${escapar(pc.caracter)}' → c₂=${pc.c2}</title>
+    </circle>
+    <text x="${ptC2.x.toFixed(1)}" y="${(ptC2.y - 9).toFixed(1)}" font-size="10" fill="${color}" text-anchor="middle" font-weight="700">${escapar(pc.caracter)}</text>
+  `;
+}
+
+function renderizarRelojCifrado(p, puntosCifrado, modo, indice) {
+  const size = 260, c = size / 2, r = size / 2 - 34;
+  const base = `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="2 4" />`;
+
+  if (!puntosCifrado || puntosCifrado.length === 0) {
+    return `<svg viewBox="0 0 ${size} ${size}" width="100%" height="260" xmlns="http://www.w3.org/2000/svg">${base}</svg>`;
+  }
+
+  let contenido = "";
+  if (modo === "todos") {
+    // Todos los c₂ juntos, cada uno con el color de su carácter
+    puntosCifrado.forEach((pc, idx) => {
+      contenido += _puntoC2Svg(p, c, r, pc, PALETA_RELOJ_CIFRADO[idx % PALETA_RELOJ_CIFRADO.length]);
+    });
+  } else {
+    // Un carácter a la vez, con detalle completo (m, c1, yk, c2 + líneas)
+    const idx = Math.max(0, Math.min(indice, puntosCifrado.length - 1));
+    contenido = _puntoCifradoSvg(p, c, r, puntosCifrado[idx], "var(--purple)", 6);
+  }
+
+  return `
+    <svg viewBox="0 0 ${size} ${size}" width="100%" height="260" xmlns="http://www.w3.org/2000/svg">
+      ${base}
+      ${contenido}
+    </svg>
+  `;
+}
+
+function renderRelojCifrado() {
+  const svgDiv    = document.getElementById("reloj-cifrado-svg");
+  const contador  = document.getElementById("reloj-cifrado-contador");
+  const leyenda   = document.getElementById("reloj-cifrado-legend");
+  const btnModo   = document.getElementById("reloj-cifrado-btn-modo");
+  const btnPrev   = document.getElementById("reloj-cifrado-btn-prev");
+  const btnNext   = document.getElementById("reloj-cifrado-btn-next");
+  if (!svgDiv) return;
+
+  const { p } = sesion.clave_publica || {};
+  const puntos = sesion.relojPuntosCifrado || [];
+
+  if (!p) {
+    svgDiv.innerHTML = `<p class="interactive-note">Genera las claves primero.</p>`;
+    if (leyenda) leyenda.innerHTML = "";
+    return;
+  }
+  if (puntos.length === 0) {
+    svgDiv.innerHTML = renderizarRelojCifrado(p, [], "paso", -1);
+    if (contador) contador.textContent = `Usa "Cifrar con nuevo k" arriba para ver los puntos aquí.`;
+    if (leyenda) leyenda.innerHTML = "";
+    if (btnPrev) btnPrev.disabled = true;
+    if (btnNext) btnNext.disabled = true;
+    if (btnModo) btnModo.disabled = true;
+    return;
+  }
+
+  if (btnModo) btnModo.disabled = false;
+
+  if (relojCifradoIndice < 0 || relojCifradoIndice > puntos.length - 1) {
+    relojCifradoIndice = puntos.length - 1; // mostrar el último cifrado por defecto
+  }
+
+  svgDiv.innerHTML = renderizarRelojCifrado(p, puntos, relojCifradoModo, relojCifradoIndice);
+
+  if (relojCifradoModo === "todos") {
+    if (contador) contador.textContent = `Mostrando los c₂ (resultado final) de los ${puntos.length} carácter${puntos.length !== 1 ? "es" : ""} cifrados hasta ahora.`;
+    if (btnPrev) btnPrev.disabled = true;
+    if (btnNext) btnNext.disabled = true;
+    if (leyenda) {
+      leyenda.innerHTML = puntos.map((pc, idx) => {
+        const color = PALETA_RELOJ_CIFRADO[idx % PALETA_RELOJ_CIFRADO.length];
+        return `<span><span class="dot" style="background:${color}"></span>'${escapar(pc.caracter)}' → c₂=${pc.c2}</span>`;
+      }).join("");
+    }
+  } else {
+    const pc = puntos[relojCifradoIndice];
+    if (contador) {
+      contador.innerHTML = `Carácter ${relojCifradoIndice + 1} / ${puntos.length}: '<b>${escapar(pc.caracter)}</b>'
+        → m=${pc.m}, k=${pc.k}, c₁=${pc.c1}, yᵏ=${pc.yk}, c₂=${pc.c2}`;
+    }
+    if (btnPrev) btnPrev.disabled = relojCifradoIndice <= 0;
+    if (btnNext) btnNext.disabled = relojCifradoIndice >= puntos.length - 1;
+    if (leyenda) {
+      leyenda.innerHTML = `
+        <span><span class="dot" style="background:var(--purple)"></span>m (mensaje)</span>
+        <span><span class="dot" style="background:var(--purple)"></span>c₁ / yᵏ</span>
+        <span><span class="dot" style="background:var(--purple)"></span>c₂ (resultado)</span>
+      `;
+    }
+  }
+}
+
+function navegarRelojCifrado(direccion) {
+  const puntos = sesion.relojPuntosCifrado || [];
+  if (puntos.length === 0) return;
+  relojCifradoIndice = Math.max(0, Math.min(relojCifradoIndice + direccion, puntos.length - 1));
+  renderRelojCifrado();
+}
+
+function alternarModoRelojCifrado() {
+  const btn = document.getElementById("reloj-cifrado-btn-modo");
+  relojCifradoModo = relojCifradoModo === "paso" ? "todos" : "paso";
+  if (btn) btn.textContent = relojCifradoModo === "paso" ? "Ver todos juntos" : "Volver a paso a paso";
+  renderRelojCifrado();
+}
+
+function toggleRelojCifrado() {
+  const cont = document.getElementById("reloj-cifrado-container");
+  const btn  = document.getElementById("reloj-cifrado-toggle");
+  if (!cont) return;
+
+  cont.classList.toggle("visible");
+  const abierto = cont.classList.contains("visible");
+  if (btn) btn.textContent = abierto ? "Ocultar reloj de cifrado" : "Ver cifrado en el reloj ↗";
+  if (abierto) renderRelojCifrado();
 }
 
 // ── Widget 3 (pestaña Descifrado): revelar la cancelación paso a paso ──

@@ -536,6 +536,54 @@
       transition: opacity .3s;
     }
     .reveal-step.revealed { opacity: 1; }
+
+    /* ── Reloj modular (ElGamal) ───────────────── */
+    .reloj-wrap { margin-top: .85rem; }
+    .reloj-toggle-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: .5rem;
+    }
+    .reloj-svg-container {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: .6rem;
+    }
+    .reloj-svg-container.visible {
+      display: block;
+      animation: reloj-expand .25s ease-out;
+    }
+    @keyframes reloj-expand {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reloj-svg-container svg { display: block; margin: 0 auto; }
+    .reloj-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem 1rem;
+      margin-top: .7rem;
+      font-size: .7rem;
+      color: var(--muted);
+    }
+    .reloj-legend .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: .3rem;
+      vertical-align: middle;
+    }
+    .reloj-caption {
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: .6rem;
+      line-height: 1.6;
+    }
+    .reloj-caption b { color: var(--purple); }
   </style>
 </head>
 <body>
@@ -553,10 +601,10 @@
       <!-- Método -->
       <div class="field">
         <label>Método de cifrado</label>
-        <select id="metodo">
-          <option value="rsa">RSA</option>
-          <option value="aes">AES-256-CBC</option>
-          <option value="elgamal">ElGamal</option>
+        <select id="metodo" class="form-select">
+          <option value="elgamal" selected>ElGamal </option>
+          <option value="rsa">RSA </option>
+          <option value="aes">AES-256 </option>
         </select>
       </div>
 
