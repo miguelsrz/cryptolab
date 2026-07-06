@@ -221,6 +221,8 @@ function cambiarTab(tab) {
 // ID del video de YouTube a mostrar en la teoría de ElGamal.
 // "Píldora formativa 42: ¿Cómo funciona el algoritmo de ElGamal?" (UPM / Thoth).
 // Cámbialo aquí si el equipo decide usar otro video.
+const YOUTUBE_RSA_ID = "CMe0COxZxb0";
+const YOUTUBE_AES_ID = "tzj1RoqRnv0";
 const YOUTUBE_ELGAMAL_ID = "N3ANaOi9gAc";
 
 function renderTeoria(metodo) {
@@ -370,30 +372,134 @@ function renderTeoria(metodo) {
     items = [
       {
         num: 1,
-        titulo: "Fundamento de RSA: factorización de enteros",
-        formula: "n = p × q   —   difícil recuperar p, q solo desde n",
+        titulo: "¿Qué es RSA y por qué usa teoría de números?",
+        formula: "",
         body: `
           <p class="step-detail">
-            La seguridad de <b>RSA</b> descansa en la <b>asimetría computacional</b> de la
-            factorización: multiplicar dos primos grandes p y q es directo, pero factorizar
-            su producto n de vuelta en p y q es computacionalmente inviable para n grande.
+            <b>RSA</b> es un criptosistema de <b>clave pública</b> propuesto por Ronald Linn
+            Rivest, Adi Shamir y Leonard Adleman en 1977. A diferencia de ElGamal, que basa su
+            seguridad en el logaritmo discreto dentro de un grupo cíclico, RSA basa toda su
+            seguridad en la dificultad de <span class="hl">factorizar un número entero grande
+            en sus dos factores primos</span>.
           </p>
           <p class="step-detail">
-            La clave pública (e, n) y la privada (d, n) se relacionan mediante
-            <span class="hl">e · d ≡ 1 (mod φ(n))</span>, donde φ(n) = (p−1)(q−1) es la
-            función Toziente de Euler.
+            Esto lo convierte en el ejemplo perfecto para conectar la <b>teoría de números</b>
+            vista en el curso con una aplicación real de seguridad informática: además de
+            cifrar mensajes, RSA se usa ampliamente para hacer <b>firmas digitales</b>.
           </p>
         `,
       },
       {
         num: 2,
-        titulo: "Algoritmo Extendido de Euclides",
+        titulo: "El módulo n y el grupo (ℤ/nℤ)*",
+        formula: "n = p × q   →   φ(n) = (p−1)(q−1)",
+        body: `
+          <p class="step-detail">
+            Se parte de dos números <b>primos grandes p y q</b>, distintos entre sí, cuyo
+            producto define el <b>módulo n = p·q</b>. A diferencia de ElGamal, aquí n <b>no es
+            primo</b>, así que el conjunto de elementos invertibles módulo n no es {1,...,n−1}
+            completo, sino el grupo <span class="hl">(ℤ/nℤ)*</span> formado solo por los
+            elementos coprimos con n.
+          </p>
+          <p class="step-detail">
+            El tamaño de ese grupo es <b>φ(n) = (p−1)(q−1)</b>, la función φ de Euler. La
+            seguridad de RSA descansa en la <b>asimetría computacional</b> de la factorización:
+            multiplicar p y q es directo, pero recuperarlos solo a partir de n es
+            computacionalmente inviable para n suficientemente grande.
+          </p>
+        `,
+      },
+      {
+        num: 3,
+        titulo: "Elección de e y relación con la clave privada d",
+        formula: "e · d ≡ 1 (mod φ(n))",
+        body: `
+          <p class="step-detail">
+            Se elige un exponente público <b>e</b> tal que 1 &lt; e &lt; φ(n) y
+            <b>mcd(e, φ(n)) = 1</b> (coprimos entre sí), lo que garantiza que e sea invertible
+            módulo φ(n). La clave pública es el par <b>(e, n)</b>.
+          </p>
+          <p class="step-detail">
+            La clave privada <b>d</b> es, precisamente, el <b>inverso modular</b> de e:
+            <span class="hl">e · d ≡ 1 (mod φ(n))</span>. Cifrar y descifrar son entonces
+            exponenciaciones modulares inversas: c = m^e mod n para cifrar, m = c^d mod n
+            para descifrar.
+          </p>
+        `,
+      },
+      {
+        num: 4,
+        titulo: "Algoritmo Extendido de Euclides y el Teorema de Euler",
         formula: "d ≡ e⁻¹ (mod φ(n))",
         body: `
           <p class="step-detail">
-            A diferencia de ElGamal (que invierte vía Fermat, porque trabaja módulo un
-            <b>primo</b>), RSA trabaja módulo n = p·q, que <b>no es primo</b>. Por eso necesita
-            el <b>Algoritmo Extendido de Euclides</b> para calcular el inverso modular de e.
+            A diferencia de ElGamal (que invierte vía el <b>Pequeño Teorema de Fermat</b>,
+            porque trabaja módulo un <b>primo</b>), RSA trabaja módulo n = p·q, que <b>no es
+            primo</b>. Por eso necesita el <b>Algoritmo Extendido de Euclides</b> para calcular
+            el inverso modular de e y obtener d.
+          </p>
+          <p class="step-detail">
+            La corrección del descifrado se apoya en el <b>Teorema de Euler</b>: para todo m
+            coprimo con n, se cumple m^φ(n) ≡ 1 (mod n). De ahí se deduce que
+            (m^e)^d = m^(ed) ≡ m (mod n), lo cual es la generalización compuesta del
+            razonamiento que en ElGamal se hace con Fermat sobre un módulo primo.
+          </p>
+        `,
+      },
+      {
+        num: 5,
+        titulo: "El Problema de la Factorización",
+        formula: "Fácil: n = p × q    |    Difícil: recuperar p, q solo desde n",
+        body: `
+          <p class="step-detail">
+            Toda la seguridad de RSA se reduce a esta asimetría: calcular n = p·q es
+            <b>rápido</b>, pero el proceso inverso — encontrar p y q conociendo solo n — <b>no
+            tiene un algoritmo eficiente conocido</b> para n suficientemente grande (miles de
+            bits).
+          </p>
+          <p class="step-detail">
+            Esta dificultad computacional (y no un secreto de implementación) es lo que protege
+            la clave privada d, incluso si toda la clave pública (e, n) es de dominio público.
+            Si un atacante lograra factorizar n, podría reconstruir φ(n) y de ahí calcular d.
+          </p>
+        `,
+      },
+      {
+        num: 6,
+        titulo: "¿Por qué RSA (en su forma básica) es determinista?",
+        formula: "mismo mensaje + misma clave pública → mismo cifrado",
+        body: `
+          <p class="step-detail">
+            A diferencia de ElGamal (probabilístico, con un exponente k aleatorio en cada
+            cifrado), el <b>RSA de libro de texto</b> es <b>determinista</b>: cifrar el mismo
+            mensaje m dos veces con la misma clave pública (e, n) produce siempre el mismo
+            criptograma c = m^e mod n.
+          </p>
+          <p class="step-detail">
+            Esto es una <b>debilidad</b> frente a la seguridad semántica de ElGamal: un
+            atacante puede detectar mensajes repetidos. Por eso, en la práctica, RSA <b>nunca</b>
+            se usa así; se combina con esquemas de <span class="hl">relleno aleatorio</span>
+            como OAEP, que añaden aleatoriedad antes de cifrar para lograr seguridad semántica.
+          </p>
+        `,
+      },
+      {
+        num: 7,
+        titulo: "Video recomendado",
+        formula: "",
+        body: `
+          <p class="step-detail">
+            Para reforzar visualmente estos conceptos, recomendamos el siguiente video:
+          </p>
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/${YOUTUBE_RSA_ID}" 
+            title="YouTube video player" frameborder="0" allowfullscreen 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+          </div>
+          <p class="video-caption">
+            "Píldora formativa: ¿Cómo funciona el algoritmo RSA?" — si el equipo prefiere
+            otro video, solo hay que reemplazar el ID en la constante
+            <code>YOUTUBE_RSA_ID</code> al inicio de script.js.
           </p>
         `,
       },
@@ -402,19 +508,141 @@ function renderTeoria(metodo) {
     items = [
       {
         num: 1,
-        titulo: "Fundamento de AES: campos de Galois GF(2⁸)",
-        formula: "AES-256-CBC",
+        titulo: "¿Qué es AES y por qué usa aritmética en campos finitos?",
+        formula: "",
         body: `
           <p class="step-detail">
-            <b>AES</b> es un cifrado <b>simétrico</b> de bloque: la misma clave cifra y
-            descifra. Sus transformaciones internas (como la S-Box) operan sobre un
-            <span class="hl">Campo de Galois GF(2⁸)</span>, donde cada byte se interpreta como
-            un polinomio con coeficientes en ℤ₂.
+            <b>AES</b> (Advanced Encryption Standard) es un algoritmo de cifrado
+            <b>simétrico</b>, estandarizado por el NIST en 2001 a partir de la propuesta
+            Rijndael de Joan Daemen y Vincent Rijmen. A diferencia de RSA y ElGamal, que son
+            de <b>clave pública</b> y basan su seguridad en un problema matemático difícil,
+            AES usa la <b>misma clave secreta</b> para cifrar y descifrar, y su seguridad
+            depende del tamaño de esa clave y de cuánto mezcla la información.
           </p>
           <p class="step-detail">
-            El modo <b>CBC</b> encadena los bloques cifrados (cada bloque se combina con XOR
-            contra el anterior antes de cifrarse), evitando que bloques idénticos de texto
-            plano produzcan el mismo cifrado.
+            Esto lo convierte en el ejemplo perfecto para ver que las <b>matemáticas
+            discretas</b> no se limitan a ℤ/pℤ: AES trabaja sobre un
+            <span class="hl">campo finito distinto</span>, GF(2⁸), donde los mismos conceptos
+            de grupo, cuerpo e inverso vuelven a aparecer, solo que con otra aritmética.
+          </p>
+        `,
+      },
+      {
+        num: 2,
+        titulo: "El campo finito GF(2⁸)",
+        formula: "GF(2⁸) = {0, 1, ..., 255}   con suma = XOR",
+        body: `
+          <p class="step-detail">
+            Se parte de un <b>byte</b> (8 bits), que puede tomar 256 valores distintos: de 0 a
+            255. Dotado de una suma y una multiplicación adecuadas (que se explican en los
+            siguientes items), este conjunto forma el campo finito <span class="hl">GF(2⁸)</span>,
+            que es el escenario donde ocurren todas las operaciones internas de AES.
+          </p>
+          <p class="step-detail">
+            A diferencia de ℤ/pℤ, donde el módulo es un <b>número primo</b>, aquí el "módulo"
+            es un polinomio especial. Esa diferencia es la razón matemática por la que en AES
+            la suma no es la suma normal de enteros, sino un <b>XOR bit a bit</b>.
+          </p>
+        `,
+      },
+      {
+        num: 3,
+        titulo: "Verificación de los 4 axiomas de grupo (con XOR)",
+        formula: "(GF(2⁸), ⊕) es grupo ⟺ cierre + asociatividad + neutro + inversos",
+        body: `
+          <p class="step-detail">
+            Para que GF(2⁸) con la operación XOR sea formalmente un <b>grupo</b> deben
+            cumplirse cuatro propiedades:
+          </p>
+          <p class="step-detail">
+            <span class="hl-green">1. Cierre:</span> a⊕b siempre es otro byte de 8 bits.
+            <br/><span class="hl-green">2. Asociatividad:</span> (a⊕b)⊕c = a⊕(b⊕c).
+            <br/><span class="hl-green">3. Elemento neutro:</span> existe 0 tal que a⊕0 = a.
+            <br/><span class="hl-green">4. Inversos:</span> todo a tiene un único inverso, y
+            resulta ser <b>él mismo</b>: a⊕a = 0.
+          </p>
+          <p class="step-detail">
+            Al cumplirse las cuatro, (GF(2⁸), ⊕) es un <b>grupo abeliano finito</b>: es lo que
+            permite que la operación <b>AddRoundKey</b> de AES (un XOR entre datos y clave) se
+            deshaga aplicando exactamente la misma operación una segunda vez.
+          </p>
+        `,
+      },
+      {
+        num: 4,
+        titulo: "El grupo multiplicativo GF(2⁸)* y la S-box",
+        formula: "GF(2⁸)* = {1, 2, ..., 255}   ⟺   grupo cíclico de orden 255",
+        body: `
+          <p class="step-detail">
+            Igual que en ElGamal, al quitar el 0 de GF(2⁸) se obtiene un grupo multiplicativo
+            <span class="hl">GF(2⁸)*</span>, cíclico, de orden 255. Todo byte distinto de cero
+            tiene un único <b>inverso multiplicativo</b>, calculado con una versión del
+            <b>Algoritmo Extendido de Euclides</b> adaptada a este campo.
+          </p>
+          <p class="step-detail">
+            Esta operación de "tomar el inverso" es la base de <b>SubBytes</b>, el paso de AES
+            que sustituye cada byte por otro mediante una tabla fija llamada <b>S-box</b>. Es
+            el mismo tipo de cálculo que usa RSA para obtener d a partir de e, solo que aquí se
+            aplica a los propios datos que se están cifrando, no a la clave.
+          </p>
+        `,
+      },
+      {
+        num: 5,
+        titulo: "¿Por qué AES-256 es difícil de romper por fuerza bruta?",
+        formula: "Fácil: cifrar con la clave    |    Difícil: probar las 2²⁵⁶ claves posibles",
+        body: `
+          <p class="step-detail">
+            A diferencia de RSA y ElGamal, la seguridad de AES no depende de resolver un
+            problema matemático elegante, sino de que la clave de <b>256 bits</b> tiene
+            <b>2²⁵⁶ valores posibles</b>: una cifra tan enorme que ni con toda la capacidad de
+            cómputo mundial actual sería viable probarlas todas.
+          </p>
+          <p class="step-detail">
+            A esto se suma que cada una de las <b>14 rondas</b> de AES-256 combina SubBytes,
+            ShiftRows, MixColumns y AddRoundKey, de forma que cambiar un solo bit de entrada
+            cambia, en promedio, la mitad de los bits de salida (<b>efecto avalancha</b>), lo
+            que impide encontrar atajos matemáticos frente a la fuerza bruta.
+          </p>
+        `,
+      },
+      {
+        num: 6,
+        titulo: "¿Por qué AES-256-CBC necesita un IV?",
+        formula: "Cᵢ = E_k(Pᵢ ⊕ Cᵢ₋₁)      C₀ = IV",
+        body: `
+          <p class="step-detail">
+            A diferencia de ElGamal (probabilístico por naturaleza), AES por sí solo es
+            <b>determinista</b>. Por eso el modo <b>CBC</b> introduce un
+            <span class="hl">Vector de Inicialización (IV)</span> aleatorio, que se combina con
+            el primer bloque antes de cifrar, y cada bloque siguiente se combina con el
+            criptograma del bloque anterior.
+          </p>
+          <p class="step-detail">
+            Esto hace que cifrar el mismo mensaje dos veces con la misma clave, pero distinto
+            IV, produzca resultados completamente distintos — la misma seguridad semántica que
+            ElGamal logra con su exponente k aleatorio, pero resuelta aquí encadenando bloques
+            en vez de aleatorizando cada cifrado desde cero.
+          </p>
+        `,
+      },
+      {
+        num: 7,
+        titulo: "Video recomendado",
+        formula: "",
+        body: `
+          <p class="step-detail">
+            Para reforzar visualmente estos conceptos, recomendamos el siguiente video:
+          </p>
+          <div class="video-embed">
+            <iframe src="https://www.youtube.com/embed/${YOUTUBE_AES_ID}"
+              title="YouTube video player" frameborder="0" allowfullscreen
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+          </div>
+          <p class="video-caption">
+            "Píldora formativa: ¿Cómo se cifra con el algoritmo AES?" — si el equipo prefiere
+            otro video, solo hay que reemplazar el ID en la constante
+            <code>YOUTUBE_AES_ID</code> al inicio de script.js.
           </p>
         `,
       },
