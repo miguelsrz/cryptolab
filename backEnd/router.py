@@ -12,14 +12,6 @@ except ImportError:
     print("[router] AVISO: 'cryptography' no está instalada. AES no disponible.")
     print("         Ejecuta: pip install cryptography")
 
-# ─────────────────────────────────────────────
-# Registro de métodos disponibles
-# Para agregar uno nuevo:
-#   1. Crea metodos/nuevo.py con generar_claves, encriptar, desencriptar
-#   2. Importa arriba
-#   3. Agrégalo a METODOS con su key
-# ─────────────────────────────────────────────
-
 METODOS = {
     "rsa":     rsa,
     "elgamal": elgamal,
@@ -57,9 +49,8 @@ def manejar_ruta(ruta: str, body: dict):
         return metodo.desencriptar(cifrado, clave_privada)
 
     if ruta == "/reloj":
-        # Ruta exclusiva de ElGamal: arma los datos del reloj modular
+        # Ruta exclusiva de ElGamal. Esto arma los datos del reloj modular
         # (grupo cíclico + generador) para que el frontend los dibuje.
-        # No depende de METODOS/metodo_key porque solo aplica a ElGamal.
         return reloj_modular.generar_datos_reloj(body)
 
     raise ValueError(f"Ruta '{ruta}' no encontrada")
