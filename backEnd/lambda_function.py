@@ -18,12 +18,7 @@ def lambda_handler(event, context):
     if not ruta or ruta == "/":
         ruta = event.get("rawPath", "/")
  
-    # Extraer solo el segmento final (/claves, /encriptar, /desencriptar)
-    # sin importar el stage (pruebarsa, prod, dev) ni el prefijo /api
-    # Ejemplos que maneja:
-    #   /pruebarsa/api/encriptar  → /encriptar
-    #   /api/encriptar            → /encriptar
-    #   /encriptar                → /encriptar
+    # Esto extrae solo el segmento final (/claves, /encriptar, /desencriptar)
     for segmento in ["/claves", "/encriptar", "/desencriptar", "/reloj"]:
         if ruta.endswith(segmento):
             ruta = segmento

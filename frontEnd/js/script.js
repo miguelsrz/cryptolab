@@ -1,8 +1,6 @@
 const API_BASE = "/api";
 
-// ─────────────────────────────────────────────
 // Estado de la sesión
-// ─────────────────────────────────────────────
 const sesion = {
   metodo:        "elgamal",
   clave_publica: null,
@@ -20,9 +18,7 @@ const sesion = {
 // Tab activa
 let tabActiva = "claves";
 
-// ─────────────────────────────────────────────
 // INICIALIZACIÓN
-// ─────────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   cargarClaves();
 
@@ -53,9 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ─────────────────────────────────────────────
 // CLAVES
-// ─────────────────────────────────────────────
 async function cargarClaves() {
   const btn = document.getElementById("btn-generar-claves");
   if (btn) { btn.disabled = true; btn.textContent = "Generando…"; }
@@ -63,7 +57,7 @@ async function cargarClaves() {
   mostrarEstadoClaves("Generando…", "loading");
   limpiarPasos();
 
-  // Las claves anteriores dejan de servir: se invalida cualquier cifrado/descifrado previo.
+  // Las claves anteriores dejan de servir, se invalida cualquier cifrado/descifrado previo.
   sesion.ultimo_cifrado    = null;
   sesion.pasos_cifrado     = null;
   sesion.pasos_descifrado  = null;
@@ -91,23 +85,21 @@ async function cargarClaves() {
     sesion.parametros    = data.parametros;
     sesion.pasos_claves  = data.pasos_claves || [];
 
-    mostrarEstadoClaves("Claves listas ✓", "ok");
+    mostrarEstadoClaves("Claves listas", "ok");
     actualizarInfoClaves();
 
     // Mostrar pasos de generación de claves automáticamente
     cambiarTab("claves");
 
   } catch (error) {
-    mostrarEstadoClaves("Error ✗", "error");
+    mostrarEstadoClaves("Error", "error");
     console.error(error);
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = "Generar nuevas claves"; }
   }
 }
 
-// ─────────────────────────────────────────────
 // ENCRIPTAR
-// ─────────────────────────────────────────────
 async function encriptar() {
   const password     = document.getElementById("password").value.trim();
   const resultadoDiv = document.getElementById("resultado");
@@ -118,7 +110,7 @@ async function encriptar() {
   document.getElementById("resultado-descifrado-container").classList.remove("visible");
   errorDiv.classList.remove("visible");
 
-  if (!password) { mostrarError("Por favor ingresa un texto."); return; }
+  if (!password) { mostrarError("Por favor ingresa un texto/contraseña."); return; }
   if (!sesion.clave_publica) { mostrarError("Las claves aún no están listas."); return; }
 
   btn.disabled = true;
@@ -155,10 +147,8 @@ async function encriptar() {
     btn.textContent = "Encriptar";
   }
 }
-
-// ─────────────────────────────────────────────
+ 
 // DESENCRIPTAR
-// ─────────────────────────────────────────────
 async function desencriptar() {
   const errorDiv = document.getElementById("error");
   errorDiv.classList.remove("visible");
@@ -192,10 +182,8 @@ async function desencriptar() {
     mostrarError("Error: " + error.message);
   }
 }
-
-// ─────────────────────────────────────────────
+ 
 // TABS
-// ─────────────────────────────────────────────
 function cambiarTab(tab) {
   tabActiva = tab;
 
@@ -204,7 +192,7 @@ function cambiarTab(tab) {
     document.getElementById(`tab-${t}`).classList.toggle("active", t === tab);
   });
 
-  // Mostrar pasos correspondientes
+  // Mostrar los pasos correspondientes
   switch (tab) {
     case "claves":
       renderPasosClaves(sesion.pasos_claves || []);
@@ -221,12 +209,9 @@ function cambiarTab(tab) {
   }
 }
 
-// ─────────────────────────────────────────────
-// RENDER — pestaña Teoría
-// ─────────────────────────────────────────────
 
-// ID del video de YouTube a mostrar en la teoría de ElGamal.
-// "Píldora formativa 42: ¿Cómo funciona el algoritmo de ElGamal?" (UPM / Thoth).
+// RENDERIZADO DE TEORIA
+// Variables con el ID del video para tener forma mas facil de actualizar si acaso
 const YOUTUBE_RSA_ID = "CMe0COxZxb0";
 const YOUTUBE_AES_ID = "tzj1RoqRnv0";
 const YOUTUBE_ELGAMAL_ID = "N3ANaOi9gAc";
@@ -676,9 +661,7 @@ function renderPasosClaves(pasos) {
     `,
   }));
 
-  // Reloj modular didáctico: se inyecta dentro del paso que ya explica
-  // "grupo cíclico / generador" (viene del backend), en vez de crear un
-  // paso nuevo — es el lugar donde el concepto se explica en teoría.
+  // Reloj modular didáctico
   if (sesion.metodo === "elgamal") {
     const pasoGrupo = items.find(
       (it) => it.titulo && (it.titulo.includes("Grupo cíclico") || it.titulo.includes("generador"))
@@ -711,9 +694,7 @@ function renderPasosClaves(pasos) {
     }
   }
 
-  // Widget interactivo adicional solo para ElGamal: calculadora de
-  // exponenciación modular rápida (cuadrado y multiplicación), prellenada
-  // con los valores reales de la sesión (g, x, p).
+  // Calculadora de exponenciación modular
   if (sesion.metodo === "elgamal" && sesion.parametros) {
     const { g, x, p: pMod } = sesion.parametros;
     items.push({
@@ -749,9 +730,7 @@ function renderPasosClaves(pasos) {
   renderStepList(items);
 }
 
-// ─────────────────────────────────────────────
-// RENDER — pasos de cifrado
-// ─────────────────────────────────────────────
+// RENDERIZADO DE PASOS DE CIFRADO
 function renderPasosCifrado(pasos, metodo) {
   if (!pasos || pasos.length === 0) {
     mostrarPlaceholder("Encripta un texto para ver los pasos de cifrado.");
@@ -760,7 +739,7 @@ function renderPasosCifrado(pasos, metodo) {
   ocultarPlaceholder();
 
   if (metodo === "rsa") {
-    // RSA: tabla por caracter
+    // RSA
     const items = [
       {
         num: 1,
@@ -925,7 +904,7 @@ function renderPasosCifrado(pasos, metodo) {
     renderStepList(items);
   }
   else if (metodo === "aes") {
-    // AES: pasos de proceso (genéricos)
+    // AES
     const items = pasos.map((p, i) => ({
       num:     i + 1,
       titulo:  p.titulo,
@@ -939,9 +918,7 @@ function renderPasosCifrado(pasos, metodo) {
   }
 }
 
-// ─────────────────────────────────────────────
-// RENDER — pasos de descifrado
-// ─────────────────────────────────────────────
+// RENDERIZADO DE PASOS DE DESCIFRADO
 function renderPasosDescifrado(pasos, metodo) {
   if (!pasos || pasos.length === 0) {
     mostrarPlaceholder("Desencripta para ver los pasos.");
@@ -1061,7 +1038,7 @@ function renderPasosDescifrado(pasos, metodo) {
     ];
     renderStepList(items);
 
-    // Poblar el selector del simulador de revelado con los pares reales.
+    // Poblar el selector con los pares reales.
     setTimeout(() => poblarSelectorRevelado(pasos), 0);
   }
   else if (metodo === "aes") {
@@ -1078,10 +1055,7 @@ function renderPasosDescifrado(pasos, metodo) {
   }
 }
 
-// ─────────────────────────────────────────────
 // TABLAS POR MÉTODO
-// ─────────────────────────────────────────────
-
 function renderTablaRSACifrado(pasos) {
   const filas = pasos.map(p =>
     `<tr>
@@ -1149,10 +1123,8 @@ function renderTablaElGamalDescifrado(pasos) {
       <tbody>${filas}</tbody>
     </table>`;
 }
-
-// ─────────────────────────────────────────────
-// RENDER — lista de pasos genérica con accordion
-// ─────────────────────────────────────────────
+ 
+// RENDERIZADO DE LISTA DE PASOS
 function renderStepList(items) {
   const container = document.getElementById("step-list");
   container.innerHTML = "";
@@ -1191,12 +1163,7 @@ function toggleStep(head) {
   head.parentElement.classList.toggle("open");
 }
 
-// ─────────────────────────────────────────────
-// SIMULADORES INTERACTIVOS (matemática en el cliente)
-// Reimplementan, en JS, las mismas rutinas de elgamal.py
-// (aritmética modular pequeña, segura como Number en JS).
-// ─────────────────────────────────────────────
-
+// SIMULADORES INTERACTIVOS
 function potenciaModularJS(base, exp, mod) {
   let resultado = 1;
   let b = ((base % mod) + mod) % mod;
@@ -1210,12 +1177,10 @@ function potenciaModularJS(base, exp, mod) {
 }
 
 function inversoModularJS(a, p) {
-  // Válido porque p es primo (Pequeño Teorema de Fermat), igual que en el backend.
   return potenciaModularJS(a, p - 2, p);
 }
 
-// Traza bit a bit del algoritmo de cuadrado y multiplicación,
-// para mostrar visualmente cómo se calcula base^exp mod mod.
+// Muestra bit a bit del algoritmo de cuadrado y multiplicación
 function expModTraceJS(base, exp, mod) {
   const filas = [];
   let resultado = 1;
@@ -1234,7 +1199,7 @@ function expModTraceJS(base, exp, mod) {
   return { resultado, filas };
 }
 
-// ── Widget 1 (pestaña Claves): calculadora de exponenciación modular ──
+//  Calculadora de exponenciación modular 
 function ejecutarExpModDemo() {
   const base = parseInt(document.getElementById("expdemo-base").value, 10);
   const exp  = parseInt(document.getElementById("expdemo-exp").value, 10);
@@ -1268,7 +1233,7 @@ function ejecutarExpModDemo() {
   `;
 }
 
-// ── Widget 2 (pestaña Cifrado): re-cifrar el mismo carácter con distinto k ──
+//  Volver a cifrar el mismo carácter con distinto k 
 function simularCifradoK() {
   const charInput = document.getElementById("simk-char");
   const caracter  = (charInput.value || "A").slice(0, 1);
@@ -1287,7 +1252,7 @@ function simularCifradoK() {
   }
   nota.textContent = "";
 
-  const k  = Math.floor(Math.random() * (p - 3)) + 2; // k ∈ [2, p-2]
+  const k  = Math.floor(Math.random() * (p - 3)) + 2; // k pertenece a [2, p-2]
   const c1 = potenciaModularJS(g, k, p);
   const yk = potenciaModularJS(y, k, p);
   const c2 = (m * yk) % p;
@@ -1321,12 +1286,7 @@ function limpiarSimuladorCifrado() {
   renderRelojCifrado();
 }
 
-// ─────────────────────────────────────────────
-// RELOJ MODULAR (ElGamal)
-// Todo el cálculo se hace en el cliente reutilizando potenciaModularJS,
-// igual que el resto de simuladores de este archivo — sin llamar a /reloj.
-// ─────────────────────────────────────────────
-
+// RELOJ MODULAR PARA ELGAMAL
 function esPrimoJS(n) {
   if (n < 2) return false;
   if (n === 2) return true;
@@ -1356,8 +1316,7 @@ function encontrarGeneradorJS(p) {
   return 2;
 }
 
-// Convierte una posición 1..moduloVisual en un ángulo en grados,
-// empezando arriba (12 en punto) y avanzando en sentido horario.
+// Esto convierte una posición 1..moduloVisual en un ángulo en grados
 function anguloParaJS(posicion, moduloVisual) {
   const fraccion = (((posicion % moduloVisual) + moduloVisual) % moduloVisual) / moduloVisual;
   return fraccion * 360 - 90;
@@ -1368,9 +1327,7 @@ function puntoEnCirculoJS(anguloGrados, cx, cy, radio) {
   return { x: cx + radio * Math.cos(rad), y: cy + radio * Math.sin(rad) };
 }
 
-// ── Reloj didáctico (pestaña Claves) ──────────────────────────────
-// Grupo pequeño (p entre 11 y 30) generado solo para fines visuales,
-// igual que reloj_modular.py hace en el backend.
+//  Reloj didáctico en la pestaña de Claves
 function construirRelojDidacticoJS() {
   const candidatos = [];
   for (let n = 11; n <= 30; n++) if (esPrimoJS(n)) candidatos.push(n);
@@ -1391,7 +1348,7 @@ function renderizarRelojDidactico(clock) {
   const size = 260, c = size / 2, r = size / 2 - 34;
   const { p, orbita } = clock;
 
-  // Todas las posiciones del grupo, como marcas de fondo
+// Todas las posiciones del grupo como marcas de fondo
   const marcas = [];
   for (let v = 1; v < p; v++) {
     const pt = puntoEnCirculoJS(anguloParaJS(v, p), c, c, r);
@@ -1502,15 +1459,10 @@ function animarOrbitaDidactica() {
   paso();
 }
 
-// ── Cifrado en el reloj (pestaña Cifrado) ─────────────────────────
-// Muestra los puntos (m, c1, yk, c2) de cada carácter cifrado con el
-// simulador de re-cifrado, conectados con líneas que muestran
-// c₂ = m · yᵏ mod p. Dos modos:
-//   - "paso": un carácter a la vez, navegable con ◀ Anterior / Siguiente ▶
-//   - "todos": todos los caracteres cifrados hasta ahora, superpuestos
+//  Cifrado en el reloj de la pestaña Cifrado
 const PALETA_RELOJ_CIFRADO = ["var(--accent)", "var(--yellow)", "var(--green)", "var(--purple)", "var(--red)"];
 
-let relojCifradoModo   = "paso"; // "paso" | "todos"
+let relojCifradoModo   = "paso"; // "paso" o "todos"
 let relojCifradoIndice = -1;     // índice del carácter mostrado en modo "paso"
 
 function _puntoCifradoSvg(p, c, r, pc, color, radioM = 5) {
@@ -1533,9 +1485,7 @@ function _puntoCifradoSvg(p, c, r, pc, color, radioM = 5) {
   return lineas + puntos;
 }
 
-// Modo "todos": solo se dibuja el punto final c₂ de cada carácter (sin
-// m/c1/yk ni líneas), para ver de un vistazo dónde cayó cada resultado
-// cifrado sobre el reloj, sin saturar el dibujo con 4 puntos x carácter.
+// Modo "todos": dibuja solo los c₂ finales, cada uno con el color de su carácter
 function _puntoC2Svg(p, c, r, pc, color) {
   const ptC2 = puntoEnCirculoJS(anguloParaJS(pc.c2, p), c, c, r);
   return `
@@ -1561,7 +1511,7 @@ function renderizarRelojCifrado(p, puntosCifrado, modo, indice) {
       contenido += _puntoC2Svg(p, c, r, pc, PALETA_RELOJ_CIFRADO[idx % PALETA_RELOJ_CIFRADO.length]);
     });
   } else {
-    // Un carácter a la vez, con detalle completo (m, c1, yk, c2 + líneas)
+    // Un carácter a la vez, con detalle completo
     const idx = Math.max(0, Math.min(indice, puntosCifrado.length - 1));
     contenido = _puntoCifradoSvg(p, c, r, puntosCifrado[idx], "var(--purple)", 6);
   }
@@ -1662,7 +1612,7 @@ function toggleRelojCifrado() {
   if (abierto) renderRelojCifrado();
 }
 
-// ── Widget 3 (pestaña Descifrado): revelar la cancelación paso a paso ──
+//  Revelar la cancelación paso a paso 
 let revelado = { c1: null, c2: null, s: null, s_inv: null, m: null };
 
 function poblarSelectorRevelado(pasos) {
@@ -1724,10 +1674,8 @@ function revelarPaso(numero) {
     elM.classList.add("revealed");
   }
 }
-
-// ─────────────────────────────────────────────
-// HELPERS de UI
-// ─────────────────────────────────────────────
+ 
+// HELPERS DE LA INTERFAZ
 function renderKV(obj) {
   const entries = Object.entries(obj);
   if (entries.length === 0) return "";

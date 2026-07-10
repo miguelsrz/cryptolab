@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Encriptador — Discretas 2</title>
+  <title>CryptoLab</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
-    /* ── Variables ─────────────────────────────── */
+    /*  Variables  */
     :root {
       --bg:         #0d1117;
       --surface:    #161b22;
@@ -28,7 +28,7 @@
       --sans:       'DM Sans', sans-serif;
     }
 
-    /* ── Reset & base ──────────────────────────── */
+    /*  Reset & base  */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
@@ -55,7 +55,7 @@
       z-index: 0;
     }
 
-    /* ── Layout ────────────────────────────────── */
+    /*  Layout  */
     .layout {
       position: relative;
       z-index: 1;
@@ -71,7 +71,7 @@
       .layout { grid-template-columns: 1fr; }
     }
 
-    /* ── Card base ─────────────────────────────── */
+    /*  Card base  */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -79,7 +79,7 @@
       padding: 1.5rem;
     }
 
-    /* ── Header ────────────────────────────────── */
+    /*  Header  */
     header {
       position: relative;
       z-index: 1;
@@ -101,7 +101,7 @@
       margin-top: .2rem;
     }
 
-    /* ── Form panel ────────────────────────────── */
+    /*  Form panel  */
     .panel-form { display: flex; flex-direction: column; gap: 1rem; }
 
     .field label {
@@ -132,7 +132,7 @@
       box-shadow: 0 0 0 3px rgba(88,166,255,.12);
     }
 
-    /* ── Key info box ──────────────────────────── */
+    /*  Key info box  */
     .key-box {
       background: var(--surface2);
       border: 1px solid var(--border);
@@ -171,7 +171,7 @@
     .badge-ok      { background: var(--green-dim);  color: var(--green);  }
     .badge-error   { background: #2d0e0e;            color: var(--red);    }
 
-    /* ── Buttons ───────────────────────────────── */
+    /*  Buttons  */
     .btn {
       width: 100%;
       border: none;
@@ -201,7 +201,7 @@
     }
     .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* ── Result boxes ──────────────────────────── */
+    /*  Result boxes  */
     .result-box {
       background: var(--surface2);
       border: 1px solid var(--border);
@@ -226,7 +226,7 @@
     .result-box.green { border-color: #1a4a1a; background: var(--green-dim); }
     .result-box.blue  { border-color: #1a3050; background: var(--accent-dim); }
 
-    /* ── Error ─────────────────────────────────── */
+    /*  Error  */
     .error-msg {
       color: var(--red);
       font-size: .8rem;
@@ -235,7 +235,7 @@
     }
     .error-msg.visible { display: block; }
 
-    /* ── Steps panel ───────────────────────────── */
+    /*  Steps panel  */
     .panel-steps { display: flex; flex-direction: column; gap: 0; }
 
     .steps-header {
@@ -537,7 +537,7 @@
     }
     .reveal-step.revealed { opacity: 1; }
 
-    /* ── Reloj modular (ElGamal) ───────────────── */
+    /*  Reloj modular (ElGamal)  */
     .reloj-wrap { margin-top: .85rem; }
     .reloj-toggle-row {
       display: flex;
@@ -589,13 +589,13 @@
 <body>
 
   <header>
-    <h1>// encriptador</h1>
-    <p>Matemáticas Discretas 2 — RSA · ElGamal · AES-256-CBC</p>
+    <h1>// CryptoLab</h1>
+    <p>Proyecto de Matemáticas Discretas 2</p>
   </header>
 
   <div class="layout">
 
-    <!-- ── LEFT: form panel ──────────────────── -->
+    <!--  IZQUIERDA: form panel  -->
     <div class="card panel-form">
 
       <!-- Método -->
@@ -624,7 +624,7 @@
       <!-- Contraseña -->
       <div class="field">
         <label>Texto a cifrar</label>
-        <input id="password" type="text" placeholder="Ingresa tu contraseña…" autocomplete="off" />
+        <input id="password" type="text" placeholder="Ingresa tu texto/contraseña…" autocomplete="off" />
       </div>
 
       <!-- Botón encriptar -->
@@ -650,9 +650,9 @@
       <!-- Error -->
       <div id="error" class="error-msg"></div>
 
-    </div><!-- /panel-form -->
+    </div>
 
-    <!-- ── RIGHT: steps panel ────────────────── -->
+    <!--  DERECHA: Paso a paso  -->
     <div class="card panel-steps">
 
       <div class="steps-header">
@@ -665,7 +665,7 @@
         </div>
       </div>
 
-      <!-- Placeholder (se oculta cuando hay pasos) -->
+      <!-- Placeholder -->
       <div id="steps-placeholder" class="steps-placeholder">
         <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5"
              viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -675,12 +675,12 @@
         <p>Los pasos aparecerán aquí<br/>después de generar las claves o cifrar.</p>
       </div>
 
-      <!-- Step list container -->
+      <!-- Contenedor paso a paso -->
       <div id="step-list" class="step-list"></div>
 
-    </div><!-- /panel-steps -->
+    </div>
 
-  </div><!-- /layout -->
+  </div>
 
   <script src="./js/script.js"></script>
 </body>

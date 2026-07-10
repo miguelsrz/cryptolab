@@ -13,10 +13,7 @@ Sin dependencias externas: usa solo aritmética modular, igual que rsa.py.
 import random
 
 
-# ─────────────────────────────────────────────
 # Primalidad
-# ─────────────────────────────────────────────
-
 def es_primo(n: int) -> bool:
     if n < 2:
         return False
@@ -37,10 +34,7 @@ def primo_aleatorio(minimo: int = 10_000, maximo: int = 50_000) -> int:
             return candidato
 
 
-# ─────────────────────────────────────────────
 # Aritmética modular
-# ─────────────────────────────────────────────
-
 def potencia_modular(base: int, exp: int, mod: int) -> int:
     resultado = 1
     base = base % mod
@@ -56,10 +50,7 @@ def inverso_modular(a: int, p: int) -> int:
     return potencia_modular(a, p - 2, p)
 
 
-# ─────────────────────────────────────────────
-# Generador (raíz primitiva mod p)
-# ─────────────────────────────────────────────
-
+# Generador. Raíz primitiva mod p
 def encontrar_generador(p: int) -> int:
     phi = p - 1
     factores = set()
@@ -79,10 +70,8 @@ def encontrar_generador(p: int) -> int:
     return 2
 
 
-# ─────────────────────────────────────────────
-# Interfaz estándar
-# ─────────────────────────────────────────────
 
+# Interfaz estándar
 def generar_claves() -> dict:
     p = primo_aleatorio(10_000, 50_000)
     g = encontrar_generador(p)
