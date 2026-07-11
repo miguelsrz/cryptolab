@@ -49,6 +49,21 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+function mostrarSeccion(seccion) {
+  ["intro", "app"].forEach(s => {
+    document.getElementById(`seccion-${s}`).classList.toggle("active", s === seccion);
+    document.getElementById(`switch-${s}`).classList.toggle("active", s === seccion);
+  });
+}
+
+function mostrarModoIntro(modo) {
+  ["simetrico", "asimetrico"].forEach(m => {
+    document.getElementById(`toggle-${m}`).classList.toggle("active", m === modo);
+    document.getElementById(`escena-${m}`).style.display = m === modo ? "flex" : "none";
+    document.getElementById(`intro-explicacion-${m}`).style.display = m === modo ? "block" : "none";
+  });
+}
+
 // CLAVES
 async function cargarClaves() {
   const btn = document.getElementById("btn-generar-claves");
@@ -230,33 +245,33 @@ function renderTeoria(metodo) {
         body: `
           <p class="step-detail">
             <b>ElGamal</b> es un criptosistema de <b>clave pública</b> propuesto por Taher
-            Elgamal en 1984. A diferencia de RSA, que basa su seguridad en la dificultad de
+            Elgamal en 1985. A diferencia de RSA, que basa su seguridad en la dificultad de
             <b>factorizar</b> un número grande, ElGamal basa toda su seguridad en la dificultad
             de resolver el <span class="hl">Problema del Logaritmo Discreto (PLD)</span> dentro
             de un <b>grupo cíclico finito</b>.
           </p>
           <p class="step-detail">
-            Esto lo convierte en el ejemplo perfecto para conectar la <b>teoría de grupos</b>
-            vista en el curso con una aplicación real de seguridad informática: cada operación
-            de cifrado y descifrado es, literalmente, una manipulación algebraica de elementos
+            Esto conecta la <b>teoría de grupos</b>
+            vista durante el curso con una aplicación real de seguridad informática, ya que cada operación
+            de cifrado y descifrado es una manipulación algebraica de elementos
             de un grupo.
           </p>
         `,
       },
       {
         num: 2,
-        titulo: "El campo finito 𝔽ₚ y el grupo multiplicativo (ℤ/pℤ)*",
-        formula: "𝔽ₚ = ℤ/pℤ   →   (ℤ/pℤ)* = {1, 2, ..., p−1}",
+        titulo: "El grupo multiplicativo ℤ*ₚ",
+        formula: "ℤ<sub>p</sub><sup>*</sup> = {1, 2, ..., p−1}",
         body: `
           <p class="step-detail">
-            Se parte de un número <b>primo p</b>, que define el campo finito 𝔽ₚ. De ese campo
-            se extrae el conjunto de sus elementos <b>distintos de cero</b>: {1, 2, ..., p−1}.
-            Dotado de la operación <b>multiplicación módulo p</b>, este conjunto forma el grupo
-            <span class="hl">(ℤ/pℤ)*</span>, que es el escenario donde ocurre todo ElGamal.
+            Se parte de un número <b>primo p</b>. Con él se forma el conjunto de todos los
+            enteros entre 1 y p−1, dotado de la operación <b>multiplicación módulo p</b>.
+            Ese conjunto con esa operación es el grupo <span class="hl">ℤ<sub>p</sub><sup>*</sup></span>,
+            donde ocurre todo ElGamal.
           </p>
           <p class="step-detail">
             Como p es primo, ningún elemento de 1 a p−1 comparte factores con p, así que todos
-            son invertibles. Esa es la razón matemática por la que se descarta el 0: no tiene
+            son invertibles. Por esta razón se descarta el 0, no tiene
             inverso multiplicativo y rompería la estructura de grupo.
           </p>
         `,
@@ -264,58 +279,59 @@ function renderTeoria(metodo) {
       {
         num: 3,
         titulo: "Verificación de los 4 axiomas de grupo",
-        formula: "(G, ·) es grupo ⟺ cierre + asociatividad + neutro + inversos",
+        formula: "(G, ·) es grupo ⟺ cierre, asociatividad, neutro e inversos",
         body: `
           <p class="step-detail">
-            Para que (ℤ/pℤ)* sea formalmente un <b>grupo</b> deben cumplirse cuatro
-            propiedades:
+            Para que ℤ<sub>p</sub><sup>*</sup> sea formalmente un <b>grupo</b> deben cumplirse
+            cuatro propiedades:
           </p>
           <p class="step-detail">
             <span class="hl-green">1. Cierre:</span> a·b mod p siempre pertenece a {1,...,p−1}.
             <br/><span class="hl-green">2. Asociatividad:</span> (a·b)·c ≡ a·(b·c) (mod p).
             <br/><span class="hl-green">3. Elemento neutro:</span> existe 1 tal que a·1 ≡ a (mod p).
             <br/><span class="hl-green">4. Inversos:</span> todo a tiene un único a⁻¹ tal que
-            a·a⁻¹ ≡ 1 (mod p), garantizado por el <b>Pequeño Teorema de Fermat</b>
-            (a^(p−2) ≡ a⁻¹ mod p, porque p es primo).
+            a·a⁻¹ ≡ 1 (mod p) que se garantiza por el <b>Pequeño Teorema de Fermat</b>
+            , a<sup>p−2</sup> ≡ a⁻¹ mod p (porque p es primo).
           </p>
           <p class="step-detail">
-            Al cumplirse las cuatro, (ℤ/pℤ)* es un <b>grupo abeliano finito</b>: exactamente
-            la estructura que ElGamal necesita para que cifrar y descifrar sean operaciones
-            inversas bien definidas.
+            Al cumplirse las cuatro, ℤ<sub>p</sub><sup>*</sup> es un <b>grupo abeliano finito</b>.
+            Esta es la estructura que ElGamal necesita para que cifrar y descifrar sean
+            operaciones inversas bien definidas.
           </p>
         `,
       },
       {
         num: 4,
         titulo: "Grupos cíclicos, generadores y el Teorema de Lagrange",
-        formula: "⟨g⟩ = (ℤ/pℤ)*   ⟺   orden(g) = p − 1",
+        formula: "⟨g⟩ = ℤ<sub>p</sub><sup>*</sup>   ⟺   orden(g) = p − 1",
         body: `
           <p class="step-detail">
-            (ℤ/pℤ)* siempre es <b>cíclico</b>: existe al menos un elemento <b>g</b>, llamado
-            <span class="hl">generador o raíz primitiva</span>, cuyas potencias g¹, g², g³, ...
-            recorren <b>todo</b> el grupo antes de repetirse. El orden del grupo es |(ℤ/pℤ)*| = p−1.
+            ℤ<sub>p</sub><sup>*</sup> siempre es <b>cíclico</b> ya que existe al menos un elemento
+            <b>g</b>, llamado <span class="hl">generador</span>, cuyas potencias
+            g¹, g², g³, ... recorren <b>todo</b> el grupo antes de repetirse. El orden del grupo
+            es |ℤ<sub>p</sub><sup>*</sup>| = p−1.
           </p>
           <p class="step-detail">
-            Encontrar g de forma eficiente usa el <b>Teorema de Lagrange</b>: en un grupo finito,
-            el orden de cualquier elemento debe dividir al orden del grupo. Por lo tanto, basta
-            factorizar φ = p−1 en sus primos q y verificar que g^(φ/q) ≠ 1 (mod p) para cada uno;
-            si ninguno colapsa a 1, g genera necesariamente todo el grupo.
+            Encontrar g de forma eficiente usa el <b>Teorema de Lagrange</b>, en un grupo finito
+            el orden de cualquier elemento debe dividir al orden del grupo. Por lo tanto, factorizamos
+            φ = p−1 en sus primos q y verificar que g<sup>φ/q</sup> ≠ 1 (mod p) para
+            cada uno. Si ninguno llega a colapsar a 1, g genera todo el grupo.
           </p>
         `,
       },
       {
         num: 5,
         titulo: "El Problema del Logaritmo Discreto (PLD)",
-        formula: "Fácil: y = gˣ mod p    |    Difícil: recuperar x desde (g, p, y)",
+        formula: "Es fácil realizar y = gˣ mod p , pero es difícil: recuperar x desde (g, p, y)",
         body: `
           <p class="step-detail">
-            Toda la seguridad de ElGamal se reduce a esta asimetría: calcular y = g<sup>x</sup>
-            mod p es <b>rápido</b> (exponenciación modular, O(log x)), pero el proceso inverso —
-            encontrar x conociendo solo g, p y y— <b>no tiene un algoritmo eficiente conocido</b>
+            Toda la seguridad de ElGamal se reduce a la asimetría de calcular y = g<sup>x</sup>
+            mod p , esto es <b>rápido</b> (exponenciación modular con complejidad O(log x)), pero el proceso inverso
+            de encontrar x conociendo solo y, p y g, <b>no tiene un algoritmo eficiente conocido</b>
             para p suficientemente grande.
           </p>
           <p class="step-detail">
-            Esta dificultad computacional (y no un secreto de implementación) es lo que protege
+            Esta dificultad computacional es lo que protege
             la clave privada x, incluso si toda la clave pública (p, g, y) es de dominio público.
           </p>
         `,
@@ -323,24 +339,24 @@ function renderTeoria(metodo) {
       {
         num: 6,
         titulo: "¿Por qué ElGamal es un cifrado probabilístico?",
-        formula: "k efímero y aleatorio → mismo mensaje, cifrados distintos",
+        formula: "k efímero y aleatorio hace que un mismo mensaje tenga cifrados distintos",
         body: `
           <p class="step-detail">
-            A diferencia de RSA (determinista), ElGamal introduce un exponente <b>k</b> aleatorio
+            A diferencia de RSA (que es determinista), ElGamal introduce un exponente <b>k</b> aleatorio
             y efímero en <b>cada</b> operación de cifrado. Esto hace que cifrar el mismo mensaje
             dos veces con la misma clave pública produzca resultados completamente distintos.
           </p>
           <p class="step-detail">
-            Esta propiedad se llama <span class="hl">seguridad semántica</span>: un atacante que
+            Esta propiedad se llama <span class="hl">seguridad semántica</span>, un atacante que
             observa el cifrado no puede saber si dos criptogramas corresponden al mismo mensaje
-            original, lo cual es una ventaja de seguridad importante frente a esquemas
+            original, siendo una ventaja de seguridad importante frente a esquemas
             deterministas.
           </p>
         `,
       },
       {
         num: 7,
-        titulo: "Video recomendado",
+        titulo: "(Extra) Video recomendado",
         formula: "",
         body: `
           <p class="step-detail">
@@ -352,9 +368,7 @@ function renderTeoria(metodo) {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
           </div>
           <p class="video-caption">
-            "Píldora formativa: ¿Cómo funciona el algoritmo de ElGamal?" — si el equipo prefiere
-            otro video, solo hay que reemplazar el ID en la constante
-            <code>YOUTUBE_ELGAMAL_ID</code> al inicio de script.js.
+            "Píldora formativa: ¿Cómo funciona el algoritmo de ElGamal?" 
           </p>
         `,
       },
@@ -413,8 +427,8 @@ function renderTeoria(metodo) {
           <p class="step-detail">
             La clave privada <b>d</b> es, precisamente, el <b>inverso modular</b> de e:
             <span class="hl">e · d ≡ 1 (mod φ(n))</span>. Cifrar y descifrar son entonces
-            exponenciaciones modulares inversas: c = m^e mod n para cifrar, m = c^d mod n
-            para descifrar.
+            exponenciaciones modulares inversas: c = m<sup>e</sup> mod n para cifrar,
+            m = c<sup>d</sup> mod n para descifrar.
           </p>
         `,
       },
@@ -431,8 +445,8 @@ function renderTeoria(metodo) {
           </p>
           <p class="step-detail">
             La corrección del descifrado se apoya en el <b>Teorema de Euler</b>: para todo m
-            coprimo con n, se cumple m^φ(n) ≡ 1 (mod n). De ahí se deduce que
-            (m^e)^d = m^(ed) ≡ m (mod n), lo cual es la generalización compuesta del
+            coprimo con n, se cumple m<sup>φ(n)</sup> ≡ 1 (mod n). De ahí se deduce que
+            (m<sup>e</sup>)<sup>d</sup> = m<sup>ed</sup> ≡ m (mod n), lo cual es la generalización compuesta del
             razonamiento que en ElGamal se hace con Fermat sobre un módulo primo.
           </p>
         `,
@@ -464,7 +478,7 @@ function renderTeoria(metodo) {
             A diferencia de ElGamal (probabilístico, con un exponente k aleatorio en cada
             cifrado), el <b>RSA de libro de texto</b> es <b>determinista</b>: cifrar el mismo
             mensaje m dos veces con la misma clave pública (e, n) produce siempre el mismo
-            criptograma c = m^e mod n.
+            criptograma c = m<sup>e</sup> mod n.
           </p>
           <p class="step-detail">
             Esto es una <b>debilidad</b> frente a la seguridad semántica de ElGamal: un
@@ -476,7 +490,7 @@ function renderTeoria(metodo) {
       },
       {
         num: 7,
-        titulo: "Video recomendado",
+        titulo: "(Extra) Video recomendado",
         formula: "",
         body: `
           <p class="step-detail">
@@ -488,9 +502,7 @@ function renderTeoria(metodo) {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
           </div>
           <p class="video-caption">
-            "Píldora formativa: ¿Cómo funciona el algoritmo RSA?" — si el equipo prefiere
-            otro video, solo hay que reemplazar el ID en la constante
-            <code>YOUTUBE_RSA_ID</code> al inicio de script.js.
+            "Píldora formativa: ¿Cómo funciona el algoritmo RSA?"
           </p>
         `,
       },
@@ -499,7 +511,7 @@ function renderTeoria(metodo) {
     items = [
       {
         num: 1,
-        titulo: "¿Qué es AES y por qué usa aritmética en campos finitos?",
+        titulo: "¿Qué es AES y qué estructura algebraica usa?",
         formula: "",
         body: `
           <p class="step-detail">
@@ -512,27 +524,27 @@ function renderTeoria(metodo) {
           </p>
           <p class="step-detail">
             Esto lo convierte en el ejemplo perfecto para ver que las <b>matemáticas
-            discretas</b> no se limitan a ℤ/pℤ: AES trabaja sobre un
-            <span class="hl">campo finito distinto</span>, GF(2⁸), donde los mismos conceptos
-            de grupo, cuerpo e inverso vuelven a aparecer, solo que con otra aritmética.
+            discretas</b> no se limitan a ℤ<sub>p</sub><sup>*</sup>: AES trabaja sobre el
+            conjunto de <span class="hl">bytes GF(2⁸)</span>, donde los mismos conceptos de
+            grupo e inverso vuelven a aparecer, solo que con otra operación.
           </p>
         `,
       },
       {
         num: 2,
-        titulo: "El campo finito GF(2⁸)",
+        titulo: "El conjunto de bytes GF(2⁸)",
         formula: "GF(2⁸) = {0, 1, ..., 255}   con suma = XOR",
         body: `
           <p class="step-detail">
             Se parte de un <b>byte</b> (8 bits), que puede tomar 256 valores distintos: de 0 a
             255. Dotado de una suma y una multiplicación adecuadas (que se explican en los
-            siguientes items), este conjunto forma el campo finito <span class="hl">GF(2⁸)</span>,
-            que es el escenario donde ocurren todas las operaciones internas de AES.
+            siguientes items), este conjunto se denota <span class="hl">GF(2⁸)</span> y es el
+            escenario donde ocurren todas las operaciones internas de AES.
           </p>
           <p class="step-detail">
-            A diferencia de ℤ/pℤ, donde el módulo es un <b>número primo</b>, aquí el "módulo"
-            es un polinomio especial. Esa diferencia es la razón matemática por la que en AES
-            la suma no es la suma normal de enteros, sino un <b>XOR bit a bit</b>.
+            A diferencia de ℤ<sub>p</sub><sup>*</sup>, donde el módulo es un <b>número primo</b>,
+            aquí el "módulo" es un polinomio especial. Esa diferencia es la razón matemática por
+            la que en AES la suma no es la suma normal de enteros, sino un <b>XOR bit a bit</b>.
           </p>
         `,
       },
@@ -568,7 +580,7 @@ function renderTeoria(metodo) {
             Igual que en ElGamal, al quitar el 0 de GF(2⁸) se obtiene un grupo multiplicativo
             <span class="hl">GF(2⁸)*</span>, cíclico, de orden 255. Todo byte distinto de cero
             tiene un único <b>inverso multiplicativo</b>, calculado con una versión del
-            <b>Algoritmo Extendido de Euclides</b> adaptada a este campo.
+            <b>Algoritmo Extendido de Euclides</b> adaptada a esta estructura.
           </p>
           <p class="step-detail">
             Esta operación de "tomar el inverso" es la base de <b>SubBytes</b>, el paso de AES
@@ -619,7 +631,7 @@ function renderTeoria(metodo) {
       },
       {
         num: 7,
-        titulo: "Video recomendado",
+        titulo: "(Extra) Video recomendado",
         formula: "",
         body: `
           <p class="step-detail">
@@ -631,9 +643,7 @@ function renderTeoria(metodo) {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
           </div>
           <p class="video-caption">
-            "Píldora formativa: ¿Cómo se cifra con el algoritmo AES?" — si el equipo prefiere
-            otro video, solo hay que reemplazar el ID en la constante
-            <code>YOUTUBE_AES_ID</code> al inicio de script.js.
+            "Píldora formativa: ¿Cómo se cifra con el algoritmo AES?"
           </p>
         `,
       },
@@ -656,7 +666,7 @@ function renderPasosClaves(pasos) {
     titulo:  p.titulo,
     formula: p.formula,
     body:    `
-      <p class="step-detail">${p.detalle}</p>
+      <p class="step-detail">${formatMath(p.detalle)}</p>
       ${renderKV(p.valores || {})}
     `,
   }));
@@ -681,11 +691,11 @@ function renderPasosClaves(pasos) {
                 ▶ Recorrer la órbita de g
               </button>
               <button class="btn-interactive" onclick="toggleRelojDidactico(true)">
-                🔁 Otro grupo (p distinto)
+                Otro grupo (p distinto)
               </button>
             </div>
             <p class="reloj-caption" id="reloj-didactico-caption">
-              Cada punto del reloj es un elemento de (ℤ/pℤ)*. Pulsa "Recorrer la órbita" para
+              Cada punto del reloj es un elemento de ℤ<sub>p</sub><sup>*</sup>. Pulsa "Recorrer la órbita" para
               ver cómo <b>g</b> visita cada posición, una a una, antes de volver a 1.
             </p>
           </div>
@@ -704,11 +714,11 @@ function renderPasosClaves(pasos) {
       body: `
         <p class="step-detail">
           Este es el mismo algoritmo de <b>cuadrado y multiplicación</b> que el sistema usa
-          internamente para calcular g^x mod p. Cambia los valores y observa cómo el exponente
-          se procesa <b>bit a bit</b> en lugar de multiplicar uno por uno.
+          internamente para calcular g<sup>x</sup> mod p. Cambia los valores para observar cómo el
+          exponente se procesa <b>bit a bit</b> en lugar de multiplicar uno por uno.
         </p>
         <div class="interactive-box">
-          <div class="interactive-label">🧮 Calculadora paso a paso</div>
+          <div class="interactive-label">Calculadora paso a paso</div>
           <div class="interactive-row">
             <label>Base
               <input type="number" id="expdemo-base" value="${g ?? 2}" />
@@ -779,28 +789,28 @@ function renderPasosCifrado(pasos, metodo) {
           ${resumenTexto}
           <p class="step-detail">
             El cifrado ocurre íntegramente dentro del grupo cíclico multiplicativo
-            <b>(ℤ/pℤ)*</b> generado por <span class="hl">g=${gPub}</span> módulo
-            <span class="hl">p=${pPub}</span>. Cada valor que se calcula —c₁, yᵏ, c₂— es un
+            <b>ℤ<sub>p</sub><sup>*</sup></b> generado por <span class="hl">g=${gPub}</span> módulo
+            <span class="hl">p=${pPub}</span>. Cada valor c₁, yᵏ, c₂ que se calcula es un
             elemento de ese mismo grupo, así que todas las operaciones (multiplicación,
             exponenciación, inversión) respetan sus propiedades algebraicas.
           </p>
           <p class="step-detail">
             Para <b>cada carácter</b> del mensaje se elige un exponente
-            <span class="hl">k efímero y aleatorio</span> — uno distinto incluso si el
+            <span class="hl">k efímero y aleatorio</span>, uno distinto incluso si el
             carácter se repite. Esto es lo que hace de ElGamal un cifrado
-            <b>probabilístico</b>: el mismo mensaje cifrado dos veces con la misma clave
+            <b>probabilístico</b> ya que el mismo mensaje cifrado dos veces con la misma clave
             pública produce criptogramas completamente distintos.
           </p>
         `,
       },
       {
         num: 2,
-        titulo: "2. Calcular c₁ — la huella pública del secreto efímero",
+        titulo: "2. Calcular c₁, la huella pública",
         formula: "c₁ = gᵏ mod p",
         body: `
           <p class="step-detail">
             c₁ = g<sup>k</sup> mod p = <span class="hl">${gPub}</span><sup>k</sup> mod
-            <span class="hl">${pPub}</span> es la <b>huella pública</b> del secreto efímero k,
+            <span class="hl">${pPub}</span> es la <b>huella pública</b> del k secreto,
             expresada como un elemento del grupo generado por g. Cualquiera que vea c₁ no
             puede recuperar k sin resolver el Problema del Logaritmo Discreto.
           </p>
@@ -808,22 +818,22 @@ function renderPasosCifrado(pasos, metodo) {
       },
       {
         num: 3,
-        titulo: "3. Calcular el secreto compartido yᵏ y enmascarar el mensaje",
+        titulo: "3. Calcular el 'secreto compartido' yᵏ y enmascarar el mensaje",
         formula: "yᵏ mod p   →   c₂ = m · yᵏ mod p",
         body: `
           <p class="step-detail">
             y<sup>k</sup> mod p = <span class="hl">${yPub}</span><sup>k</sup> mod
-            <span class="hl">${pPub}</span> es el <b>secreto compartido</b> efímero. Nótese
-            la igualdad clave: y<sup>k</sup> = (g<sup>x</sup>)<sup>k</sup> =
+            <span class="hl">${pPub}</span> es el <b>"secreto compartido"</b> efímero. Notamos
+            esta igualdad importante: y<sup>k</sup> = (g<sup>x</sup>)<sup>k</sup> =
             (g<sup>k</sup>)<sup>x</sup> = c₁ˣ. Esta conmutatividad de exponentes es
-            justamente lo que permitirá al receptor reconstruir y<sup>k</sup> más adelante
+            lo que permitirá al receptor reconstruir y<sup>k</sup> más adelante
             <b>sin conocer k</b>, usando su clave privada x sobre c₁.
           </p>
           <p class="step-detail">
             Finalmente, c₂ = m · y<sup>k</sup> mod p "enmascara" el mensaje multiplicándolo
             por ese secreto compartido dentro del grupo. El par <b>(c₁, c₂)</b> es el texto
             cifrado del carácter. La seguridad de todo esto depende de que, sin conocer x ni
-            k, calcular y<sup>k</sup> a partir de g, p, y y c₁ es tan difícil como resolver
+            k, calcular y<sup>k</sup> a partir de y, p, g y c₁ es tan difícil como resolver
             el PLD.
           </p>
         `,
@@ -834,12 +844,11 @@ function renderPasosCifrado(pasos, metodo) {
         formula: "",
         body: `
           <p class="step-detail">
-            Prueba cifrar el <b>mismo carácter varias veces</b>: cada clic genera un nuevo
-            k aleatorio y verás cómo (c₁, c₂) cambia por completo aunque m sea idéntico —
-            esa es la propiedad probabilística en acción.
+            Prueba cifrar el <b>mismo carácter varias veces</b>, cada clic genera un nuevo
+            k aleatorio y verás cómo (c₁, c₂) cambia por completo aunque m sea idéntico
           </p>
           <div class="interactive-box">
-            <div class="interactive-label">🎲 Simulador de re-cifrado</div>
+            <div class="interactive-label">Simulador de re-cifrado</div>
             <div class="interactive-row">
               <label>Carácter
                 <input type="text" id="simk-char" class="char-input" maxlength="1" value="A" />
@@ -865,7 +874,7 @@ function renderPasosCifrado(pasos, metodo) {
               </div>
               <div class="reloj-svg-container" id="reloj-cifrado-container">
                 <p class="reloj-caption" style="margin-top:0;">
-                  Grupo <b>(ℤ/${pPub}ℤ)*</b> — el reloj representa este grupo cíclico completo
+                  Grupo <b>ℤ<sub>${pPub}</sub><sup>*</sup></b>/ El reloj representa este grupo cíclico completo
                   (p=${pPub} posiciones), aunque solo se marcan los puntos de los caracteres
                   que cifres.
                 </p>
@@ -882,10 +891,10 @@ function renderPasosCifrado(pasos, metodo) {
                 </div>
                 <p class="interactive-note" id="reloj-cifrado-contador"></p>
                 <p class="reloj-caption">
-                  <b>Paso a paso:</b> muestra un carácter a la vez con sus 4 puntos — m (mensaje),
-                  c₁ (huella de k), yᵏ (secreto compartido) y c₂ (con borde, el resultado) — y las
-                  líneas punteadas que conectan m y yᵏ con c₂, mostrando visualmente la operación
-                  <b>c₂ = m · yᵏ mod p</b>. <b>Ver todos juntos:</b> oculta ese detalle y solo marca
+                  <b>Paso a paso.</b> Muestra un carácter a la vez con sus 4 puntos: m (mensaje),
+                  c₁ (huella de k), yᵏ (secreto compartido) y c₂ (con borde, el resultado). Y las
+                  líneas punteadas que conectan m y yᵏ con c₂, mostrando la operación
+                  <b>c₂ = m · yᵏ mod p</b> visualmente. <b>Ver todos juntos:</b> oculta ese detalle y solo marca
                   el c₂ final de cada carácter cifrado, para ver de un vistazo cómo se distribuye
                   todo el texto cifrado sobre el reloj.
                 </p>
@@ -960,7 +969,7 @@ function renderPasosDescifrado(pasos, metodo) {
     const items = [
       {
         num: 1,
-        titulo: "1. Reconstruir el secreto compartido sin conocer k",
+        titulo: "1. Reconstruir el 'secreto compartido' sin conocer k",
         formula: `s = c₁^${xPriv ?? "x"} mod ${pPriv ?? "p"}`,
         body: `
           ${resumenTexto}
@@ -968,19 +977,19 @@ function renderPasosDescifrado(pasos, metodo) {
             Como c₁ = g<sup>k</sup>, se cumple c₁<sup>x</sup> = (g<sup>k</sup>)<sup>x</sup> =
             (g<sup>x</sup>)<sup>k</sup> = y<sup>k</sup>. El receptor llega al <b>mismo</b>
             valor y<sup>k</sup> que usó quien cifró, pero aplicando su exponente secreto
-            <span class="hl">x=${xPriv}</span> sobre c₁ en vez de aplicar k sobre y. Nunca
+            <span class="hl">x=${xPriv}</span> sobre c₁ en vez de aplicar k sobre y. No se
             necesitó conocer k.
           </p>
         `,
       },
       {
         num: 2,
-        titulo: "2. Invertir el secreto dentro del grupo (ℤ/pℤ)*",
+        titulo: "2. Invertir el secreto dentro del grupo ℤ*ₚ",
         formula: `s⁻¹ ≡ s^(${pPriv ? pPriv + "−2" : "p−2"}) mod ${pPriv ?? "p"}`,
         body: `
           <p class="step-detail">
-            Todo elemento de (ℤ/pℤ)* tiene un <b>único</b> inverso multiplicativo (uno de
-            los 4 axiomas de grupo verificados antes). Se calcula vía el
+            Todo elemento de ℤ<sub>p</sub><sup>*</sup> tiene un <b>único</b> inverso multiplicativo (uno de
+            los 4 axiomas de grupo que se verificó antes). Se calcula por medio del
             <span class="hl">Pequeño Teorema de Fermat</span>: s⁻¹ = s<sup>p−2</sup> mod
             <span class="hl">${pPriv}</span>, reutilizando la misma rutina de exponenciación
             modular rápida.
@@ -989,7 +998,7 @@ function renderPasosDescifrado(pasos, metodo) {
       },
       {
         num: 3,
-        titulo: "3. Cancelar el enmascaramiento y recuperar el mensaje",
+        titulo: "3. Cancelar el 'enmascaramiento' y recuperar el mensaje",
         formula: "m = c₂ · s⁻¹ mod p",
         body: `
           <p class="step-detail">
@@ -1010,7 +1019,7 @@ function renderPasosDescifrado(pasos, metodo) {
             de la cancelación con los números reales de esta sesión.
           </p>
           <div class="interactive-box">
-            <div class="interactive-label">🔓 Simulador de descifrado</div>
+            <div class="interactive-label">Simulador de descifrado</div>
             <div class="interactive-row">
               <label>Par (c₁, c₂) del mensaje
                 <select id="reveal-select" onchange="prepararRevelado()"></select>
@@ -1022,9 +1031,9 @@ function renderPasosDescifrado(pasos, metodo) {
               <button class="btn-interactive" onclick="revelarPaso(3)">Paso 3: obtener m</button>
             </div>
             <div class="interactive-result">
-              <span class="reveal-step" id="reveal-s">s = c₁ˣ mod p = —</span><br/>
-              <span class="reveal-step" id="reveal-sinv">s⁻¹ = —</span><br/>
-              <span class="reveal-step" id="reveal-m">m = c₂ · s⁻¹ mod p = — → carácter: —</span>
+              <span class="reveal-step" id="reveal-s">s = c₁ˣ mod p = ...</span><br/>
+              <span class="reveal-step" id="reveal-sinv">s⁻¹ = ...</span><br/>
+              <span class="reveal-step" id="reveal-m">m = c₂ · s⁻¹ mod p = ... → carácter: ...</span>
             </div>
           </div>
         `,
@@ -1137,7 +1146,7 @@ function renderStepList(items) {
         <div class="step-num">${item.num}</div>
         <div class="step-title-group">
           <div class="step-title">${item.titulo}</div>
-          ${item.formula ? `<span class="step-formula">${escapar(item.formula)}</span>` : ""}
+          ${item.formula ? `<span class="step-formula">${formatMath(item.formula)}</span>` : ""}
         </div>
         <svg class="step-chevron" width="14" height="14" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
@@ -1160,7 +1169,10 @@ function renderStepList(items) {
 }
 
 function toggleStep(head) {
-  head.parentElement.classList.toggle("open");
+  const item = head.parentElement;
+  const yaAbierto = item.classList.contains("open");
+  item.parentElement.querySelectorAll(".step-item.open").forEach(el => el.classList.remove("open"));
+  if (!yaAbierto) item.classList.add("open");
 }
 
 // SIMULADORES INTERACTIVOS
@@ -1227,8 +1239,8 @@ function ejecutarExpModDemo() {
       <tbody>${filasHtml}</tbody>
     </table>
     <p class="interactive-note">
-      ${base}^${exp} mod ${mod} = <b style="color:var(--purple)">${resultado}</b>
-      &nbsp;— calculado en ${filas.length} iteración${filas.length !== 1 ? "es" : ""} en vez de ${exp} multiplicaciones directas.
+      ${base}<sup>${exp}</sup> mod ${mod} = <b style="color:var(--purple)">${resultado}</b>
+      &nbsp;, calculado en ${filas.length} iteración${filas.length !== 1 ? "es" : ""} en vez de ${exp} multiplicaciones directas.
     </p>
   `;
 }
@@ -1413,7 +1425,7 @@ function reiniciarCaptionDidactico() {
   const caption = document.getElementById("reloj-didactico-caption");
   const btnPlay = document.getElementById("reloj-didactico-btn-play");
   if (caption) {
-    caption.innerHTML = `Cada punto del reloj es un elemento de (ℤ/${_relojDidacticoActual.p}ℤ)*.
+    caption.innerHTML = `Cada punto del reloj es un elemento de ℤ<sub>${_relojDidacticoActual.p}</sub><sup>*</sup>.
       Pulsa "Recorrer la órbita" para ver cómo <b>g=${_relojDidacticoActual.g}</b> visita cada
       posición, una a una, antes de volver a 1.`;
   }
@@ -1438,8 +1450,7 @@ function animarOrbitaDidactica() {
       if (btn) { btn.disabled = false; btn.textContent = "↺ Repetir recorrido"; }
       if (caption) {
         caption.innerHTML = `g=${clock.g} recorrió las <b>${clock.phi}</b> posiciones del reloj
-          sin repetir ninguna antes de volver a 1: eso confirma que es una raíz primitiva
-          (generador) de (ℤ/${clock.p}ℤ)*.`;
+          sin repetir ninguna antes de volver a 1, eso confirma que es un generador de ℤ<sub>${clock.p}</sub><sup>*</sup>.`;
       }
       return;
     }
@@ -1659,12 +1670,12 @@ function revelarPaso(numero) {
 
   if (numero === 1) {
     revelado.s = potenciaModularJS(revelado.c1, x, p);
-    elS.innerHTML = `s = c₁ˣ mod p = ${revelado.c1}^${x} mod ${p} = <b>${revelado.s}</b>`;
+    elS.innerHTML = `s = c₁ˣ mod p = ${revelado.c1}<sup>${x}</sup> mod ${p} = <b>${revelado.s}</b>`;
     elS.classList.add("revealed");
   } else if (numero === 2) {
     if (revelado.s === null) { revelarPaso(1); }
     revelado.s_inv = inversoModularJS(revelado.s, p);
-    elSinv.innerHTML = `s⁻¹ = ${revelado.s}^${p - 2} mod ${p} = <b>${revelado.s_inv}</b>`;
+    elSinv.innerHTML = `s⁻¹ = ${revelado.s}<sup>${p - 2}</sup> mod ${p} = <b>${revelado.s_inv}</b>`;
     elSinv.classList.add("revealed");
   } else if (numero === 3) {
     if (revelado.s_inv === null) { revelarPaso(2); }
@@ -1691,6 +1702,15 @@ function escapar(str) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function formatMath(str) {
+  if (!str) return str;
+  return String(str)
+    .replace(/\(ℤ\/(\d+)ℤ\)\*/g, "ℤ<sub>$1</sub><sup>*</sup>")
+    .replace(/\(ℤ\/pℤ\)\*/g, "ℤ<sub>p</sub><sup>*</sup>")
+    .replace(/\^\(([^()]+)\)/g, "<sup>$1</sup>")
+    .replace(/\^(-?[0-9a-zA-Zφπ]+)/g, "<sup>$1</sup>");
 }
 
 function limpiarPasos() {

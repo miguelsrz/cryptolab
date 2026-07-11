@@ -5,151 +5,339 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CryptoLab</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
-    /*  Variables  */
     :root {
-      --bg:         #0d1117;
-      --surface:    #161b22;
-      --surface2:   #21262d;
-      --border:     #30363d;
-      --accent:     #58a6ff;
-      --accent-dim: #1f3a5f;
-      --green:      #3fb950;
-      --green-dim:  #0d2818;
-      --yellow:     #d29922;
-      --yellow-dim: #2d2008;
-      --red:        #f85149;
-      --purple:     #d2a8ff;
-      --purple-dim: #2d1f47;
-      --text:       #e6edf3;
-      --muted:      #8b949e;
-      --mono:       'JetBrains Mono', monospace;
-      --sans:       'DM Sans', sans-serif;
+      --bg:          #0b0a16;
+      --bg-2:        #0f0d1e;
+      --surface:     #14122a;
+      --surface2:    #1b1836;
+      --surface3:    #211d42;
+      --border:      #2d2856;
+      --border-soft: #211f3d;
+      --accent:      #7c6cf6;
+      --accent-2:    #4f7cff;
+      --accent-dim:  #221e48;
+      --blue:        #4f8cff;
+      --blue-dim:    #16203f;
+      --green:       #34d399;
+      --green-dim:   #122d29;
+      --red:         #f87171;
+      --red-dim:     #2e1620;
+      --purple:      #b79bff;
+      --purple-dim:  #241c4a;
+      --text:        #eeecfb;
+      --text-dim:    #c8c3e6;
+      --muted:       #8a84ab;
+      --mono:        'JetBrains Mono', monospace;
+      --sans:        'DM Sans', sans-serif;
+      --display:     'Space Grotesk', sans-serif;
+      --radius:      0px;
     }
 
-    /*  Reset & base  */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
 
     body {
       font-family: var(--sans);
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 2rem 1rem 4rem;
-      gap: 1.5rem;
+      padding: 0;
     }
 
-    /* grid of dots background */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image: radial-gradient(circle, #30363d 1px, transparent 1px);
+      background-image: radial-gradient(circle, #362f66 1px, transparent 1px);
       background-size: 28px 28px;
       opacity: .35;
       pointer-events: none;
       z-index: 0;
     }
 
-    /*  Layout  */
-    .layout {
+    ::selection { background: var(--accent); color: #fff; }
+
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    *::-webkit-scrollbar { width: 8px; height: 8px; }
+    *::-webkit-scrollbar-track { background: transparent; }
+    *::-webkit-scrollbar-thumb { background: var(--border); }
+    *::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      width: 96vw;
+      max-width: 1680px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 1.1rem 0 .9rem;
+      gap: .9rem;
+      min-height: 0;
+    }
+
+    /* ============ HEADER ============ */
+    header.main-header {
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 960px;
-      display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 1.25rem;
-      align-items: start;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      padding: 1.3rem 2rem;
+      border: 1px solid #3c3576;
+      background:
+        repeating-linear-gradient(45deg, rgba(255,255,255,.035) 0 2px, transparent 2px 24px),
+        linear-gradient(115deg, #241a52 0%, #372c7a 45%, #1d4ed8 100%);
+      overflow: hidden;
+    }
+    header.main-header::after {
+      content: '';
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 220px;
+      height: 220px;
+      border: 1px solid rgba(255,255,255,.14);
+      transform: rotate(20deg);
+      pointer-events: none;
+    }
+    header.main-header::before {
+      content: '';
+      position: absolute;
+      right: 40px;
+      bottom: -80px;
+      width: 140px;
+      height: 140px;
+      border: 1px solid rgba(255,255,255,.1);
+      transform: rotate(20deg);
+      pointer-events: none;
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+    .brand-mark {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      border: 1.5px solid rgba(255,255,255,.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #fff;
+      letter-spacing: -.02em;
+      background: rgba(255,255,255,.06);
+    }
+    header.main-header .header-text h1 {
+      font-family: var(--display);
+      font-size: 2.55rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: .01em;
+      line-height: 1;
+    }
+    header.main-header .header-text p {
+      font-family: var(--mono);
+      font-size: .72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: rgba(255,255,255,.72);
+      margin-top: .5rem;
+    }
+    .section-switcher {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      gap: .3rem;
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.18);
+      padding: .3rem;
+      flex-shrink: 0;
+    }
+    .switch-btn {
+      font-family: var(--sans);
+      font-size: .82rem;
+      font-weight: 600;
+      padding: .6rem 1.2rem;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,.78);
+      cursor: pointer;
+      transition: all .18s;
+      white-space: nowrap;
+    }
+    .switch-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .switch-btn.active {
+      background: #ffffff;
+      color: #241a52;
     }
 
-    @media (max-width: 740px) {
-      .layout { grid-template-columns: 1fr; }
+    .main-content {
+      flex: 1;
+      min-height: 0;
+      position: relative;
+      z-index: 1;
+    }
+    .seccion { display: none; height: 100%; min-height: 0; }
+    .seccion.active { display: flex; flex-direction: column; animation: seccion-in .3s ease; }
+    @keyframes seccion-in {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    /*  Card base  */
+    /* ============ CARD BASE ============ */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: var(--radius);
       padding: 1.5rem;
+      min-height: 0;
     }
 
-    /*  Header  */
-    header {
+    /* ============ LAYOUT ============ */
+    .layout {
       position: relative;
-      z-index: 1;
       width: 100%;
-      max-width: 960px;
-      padding-bottom: .5rem;
-      border-bottom: 1px solid var(--border);
+      height: 100%;
+      display: grid;
+      grid-template-columns: var(--left-col, clamp(300px, 23vw, 360px)) 14px 1fr;
+      grid-template-rows: minmax(0, 1fr);
+      gap: 0;
+      align-items: start;
+      min-height: 0;
     }
-    header h1 {
-      font-family: var(--mono);
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: -.5px;
+    .panel-form  { margin-right: .8rem; }
+    .panel-steps { margin-left: .8rem; }
+
+    .layout-resizer {
+      grid-column: 2;
+      align-self: stretch;
+      position: relative;
+      cursor: col-resize;
+      touch-action: none;
     }
-    header p {
-      font-size: .75rem;
-      color: var(--muted);
-      margin-top: .2rem;
+    .layout-resizer::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--border);
+      transform: translateX(-50%);
+      transition: background .15s, width .15s;
+    }
+    .layout-resizer::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 3px;
+      height: 34px;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      transform: translate(-50%, -50%);
+      transition: border-color .15s;
+    }
+    .layout-resizer:hover::before,
+    .layout-resizer.dragging::before { background: var(--accent); width: 2px; }
+    .layout-resizer:hover::after,
+    .layout-resizer.dragging::after { border-color: var(--accent); }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; grid-template-rows: none; height: auto; }
+      .layout-resizer { display: none; }
+      .panel-form, .panel-steps { margin: 0; max-height: none; }
+      body { overflow-y: auto; height: auto; min-height: 100vh; }
     }
 
-    /*  Form panel  */
-    .panel-form { display: flex; flex-direction: column; gap: 1rem; }
+    /* ============ FORM PANEL ============ */
+    .panel-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-self: start;
+      max-height: 100%;
+      overflow-y: auto;
+      border-top: 3px solid var(--purple);
+    }
 
     .field label {
       display: block;
-      font-size: .72rem;
+      font-family: var(--mono);
+      font-size: .68rem;
       font-weight: 600;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-bottom: .4rem;
+      letter-spacing: .09em;
+      margin-bottom: .45rem;
     }
 
     select, input[type="text"] {
       width: 100%;
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: .6rem .85rem;
+      border-radius: var(--radius);
+      padding: .65rem .85rem;
       color: var(--text);
       font-family: var(--mono);
       font-size: .85rem;
       outline: none;
-      transition: border-color .2s;
+      transition: border-color .2s, box-shadow .2s;
       appearance: none;
+    }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%238a84ab'%3E%3Cpath d='M5 7l5 5 5-5H5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right .8rem center;
+      padding-right: 2.2rem;
     }
     select:focus, input[type="text"]:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(88,166,255,.12);
+      box-shadow: 0 0 0 3px rgba(124,108,246,.22);
     }
+    select option { background: var(--surface2); color: var(--text); }
 
-    /*  Key info box  */
     .key-box {
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: .75rem 1rem;
+      border-radius: var(--radius);
+      padding: .8rem 1rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: .75rem;
-      min-height: 56px;
+      min-height: 58px;
     }
     .key-box-info { min-width: 0; flex: 1; }
     .key-box-info small {
-      font-size: .68rem;
+      font-family: var(--mono);
+      font-size: .64rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
       color: var(--muted);
       display: block;
-      margin-bottom: .2rem;
+      margin-bottom: .3rem;
     }
     .key-box-info span {
       font-family: var(--mono);
@@ -161,60 +349,69 @@
       text-overflow: ellipsis;
     }
     .badge {
-      font-size: .68rem;
-      font-weight: 600;
-      padding: .2rem .55rem;
-      border-radius: 20px;
+      font-family: var(--mono);
+      font-size: .64rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      padding: .3rem .6rem;
+      border: 1px solid transparent;
       white-space: nowrap;
     }
-    .badge-loading { background: var(--yellow-dim); color: var(--yellow); }
-    .badge-ok      { background: var(--green-dim);  color: var(--green);  }
-    .badge-error   { background: #2d0e0e;            color: var(--red);    }
+    .badge-loading { background: var(--blue-dim); color: var(--blue); border-color: var(--blue); }
+    .badge-ok      { background: var(--green-dim);  color: var(--green); border-color: var(--green); }
+    .badge-error   { background: var(--red-dim);     color: var(--red); border-color: var(--red); }
 
-    /*  Buttons  */
+    /* ============ BUTTONS ============ */
     .btn {
       width: 100%;
-      border: none;
-      border-radius: 8px;
-      padding: .7rem 1rem;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      padding: .72rem 1rem;
       font-family: var(--sans);
-      font-size: .9rem;
-      font-weight: 600;
+      font-size: .88rem;
+      font-weight: 700;
+      letter-spacing: .01em;
       cursor: pointer;
-      transition: filter .15s, transform .1s;
+      transition: filter .15s, transform .1s, background .15s, border-color .15s;
     }
     .btn:active { transform: scale(.98); }
     .btn-primary {
       background: var(--accent);
-      color: #000;
+      color: #fff;
+      border-color: var(--accent);
     }
-    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-primary:hover { filter: brightness(1.12); }
     .btn-primary:disabled {
-      opacity: .5;
+      opacity: .45;
       cursor: not-allowed;
       filter: none;
     }
     .btn-secondary {
-      background: var(--surface2);
+      background: transparent;
       border: 1px solid var(--border);
-      color: var(--text);
+      color: var(--text-dim);
     }
     .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
 
-    /*  Result boxes  */
+    /* ============ RESULT BOXES ============ */
     .result-box {
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: .85rem 1rem;
+      border-left: 3px solid var(--border);
+      border-radius: var(--radius);
+      padding: .9rem 1rem;
       display: none;
     }
     .result-box.visible { display: block; }
     .result-box small {
-      font-size: .68rem;
+      font-family: var(--mono);
+      font-size: .64rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
       color: var(--muted);
       display: block;
-      margin-bottom: .4rem;
+      margin-bottom: .5rem;
     }
     .result-box .value {
       font-family: var(--mono);
@@ -223,104 +420,122 @@
       word-break: break-all;
       line-height: 1.5;
     }
-    .result-box.green { border-color: #1a4a1a; background: var(--green-dim); }
-    .result-box.blue  { border-color: #1a3050; background: var(--accent-dim); }
+    .result-box.green { border-left-color: var(--green); }
+    .result-box.blue  { border-left-color: var(--blue); }
 
-    /*  Error  */
     .error-msg {
       color: var(--red);
+      font-family: var(--mono);
       font-size: .8rem;
       text-align: center;
       display: none;
     }
     .error-msg.visible { display: block; }
 
-    /*  Steps panel  */
-    .panel-steps { display: flex; flex-direction: column; gap: 0; }
+    /* ============ STEPS PANEL ============ */
+    .panel-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+      border-top: 3px solid var(--accent-2);
+    }
 
     .steps-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 1rem;
+      margin-bottom: 1.1rem;
+      flex-wrap: wrap;
+      gap: .6rem;
     }
     .steps-header h2 {
-      font-family: var(--mono);
-      font-size: .95rem;
+      font-family: var(--display);
+      font-size: 1.4rem;
       font-weight: 700;
       color: var(--text);
+      letter-spacing: .01em;
     }
-    .tab-group {
-      display: flex;
-      gap: .4rem;
-    }
+    .tab-group { display: flex; gap: .35rem; flex-wrap: wrap; }
     .tab {
-      font-size: .72rem;
-      font-weight: 600;
-      padding: .3rem .75rem;
-      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: .74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      padding: .38rem .8rem;
+      border-radius: var(--radius);
       border: 1px solid var(--border);
       background: transparent;
       color: var(--muted);
       cursor: pointer;
       transition: all .15s;
     }
+    .tab:hover { border-color: var(--accent); color: var(--text); }
     .tab.active {
       background: var(--accent);
       border-color: var(--accent);
-      color: #000;
+      color: #fff;
     }
 
-    /* placeholder when no steps */
     .steps-placeholder {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: .75rem;
+      gap: .8rem;
       padding: 3rem 1rem;
       color: var(--muted);
-      font-size: .82rem;
+      font-size: 1.05rem;
       text-align: center;
       border: 1px dashed var(--border);
-      border-radius: 10px;
+      flex: 1;
+      min-height: 0;
     }
-    .steps-placeholder svg { opacity: .3; }
+    .steps-placeholder svg { opacity: .35; }
 
-    /* step list */
-    .step-list { display: flex; flex-direction: column; gap: .75rem; }
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: .8rem;
+      overflow-y: auto;
+      flex: 1;
+      min-height: 0;
+      padding-right: .35rem;
+    }
 
     .step-item {
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: var(--radius);
       overflow: hidden;
+      flex-shrink: 0;
       opacity: 0;
       transform: translateY(8px);
-      transition: opacity .3s, transform .3s;
+      transition: opacity .3s, transform .3s, border-color .2s;
     }
-    .step-item.show {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    .step-item.show { opacity: 1; transform: translateY(0); }
+    .step-item.open { border-color: var(--accent); }
 
     .step-head {
       display: flex;
       align-items: flex-start;
-      gap: .85rem;
-      padding: .85rem 1rem;
+      gap: .9rem;
+      padding: .9rem 1.1rem;
       cursor: pointer;
       user-select: none;
     }
     .step-num {
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius);
       background: var(--accent-dim);
       border: 1px solid var(--accent);
-      color: var(--accent);
+      color: var(--purple);
       font-family: var(--mono);
-      font-size: .7rem;
+      font-size: .8rem;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -330,16 +545,17 @@
     }
     .step-title-group { flex: 1; min-width: 0; }
     .step-title {
-      font-size: .85rem;
+      font-size: 1.08rem;
       font-weight: 600;
       color: var(--text);
-      line-height: 1.3;
+      line-height: 1.35;
+      font-family: var(--sans);
     }
     .step-formula {
       font-family: var(--mono);
-      font-size: .72rem;
-      color: var(--accent);
-      margin-top: .2rem;
+      font-size: .88rem;
+      color: var(--accent-2);
+      margin-top: .35rem;
       display: block;
     }
     .step-chevron {
@@ -352,336 +568,619 @@
 
     .step-body {
       display: none;
-      padding: 0 1rem .9rem 3.45rem;
-      border-top: 1px solid var(--border);
-      padding-top: .75rem;
+      padding: 0 1.1rem 1rem 3.5rem;
+      border-top: 1px solid var(--border-soft);
+      padding-top: .8rem;
     }
     .step-item.open .step-body { display: block; }
 
     .step-detail {
-      font-size: .82rem;
-      color: var(--text);
-      line-height: 1.7;
-      margin-bottom: .6rem;
+      font-size: 1.04rem;
+      color: var(--text-dim);
+      line-height: 1.8;
+      margin-bottom: .65rem;
     }
-    .step-detail p { margin-bottom: .65rem; }
+    .step-detail p { margin-bottom: .7rem; }
     .step-detail p:last-child { margin-bottom: 0; }
-    .step-detail b, .step-detail strong {
-      color: var(--purple);
-      font-weight: 700;
-    }
-    .step-detail .hl {
-      color: var(--yellow);
-      font-weight: 700;
-    }
-    .step-detail .hl-green {
-      color: var(--green);
-      font-weight: 700;
-    }
+    .step-detail b, .step-detail strong { color: var(--purple); font-weight: 700; }
+    .step-detail .hl { color: var(--accent-2); font-weight: 700; }
+    .step-detail .hl-green { color: var(--green); font-weight: 700; }
     .step-detail code {
       font-family: var(--mono);
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: .05rem .35rem;
-      color: var(--accent);
+      border-radius: var(--radius);
+      padding: .06rem .4rem;
+      color: var(--accent-2);
     }
-    .step-values {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .4rem;
-    }
+    .step-values { display: flex; flex-wrap: wrap; gap: .45rem; }
     .kv {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: .25rem .6rem;
+      border-radius: var(--radius);
+      padding: .32rem .75rem;
       font-family: var(--mono);
-      font-size: .72rem;
+      font-size: .84rem;
       color: var(--text);
     }
     .kv span { color: var(--muted); margin-right: .3rem; }
 
-    /* char table for per-character steps */
     .char-table {
       width: 100%;
       border-collapse: collapse;
       font-family: var(--mono);
-      font-size: .72rem;
-      margin-top: .5rem;
+      font-size: .87rem;
+      margin-top: .55rem;
     }
     .char-table th {
       text-align: left;
       color: var(--muted);
       font-weight: 600;
-      padding: .3rem .5rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      font-size: .7rem;
+      padding: .45rem .6rem;
       border-bottom: 1px solid var(--border);
     }
     .char-table td {
-      padding: .35rem .5rem;
-      border-bottom: 1px solid var(--border);
+      padding: .45rem .6rem;
+      border-bottom: 1px solid var(--border-soft);
       color: var(--text);
       word-break: break-all;
     }
     .char-table tr:last-child td { border-bottom: none; }
-    .char-table .char-col {
-      color: var(--accent);
-      font-weight: 700;
-    }
+    .char-table .char-col { color: var(--purple); font-weight: 700; }
 
-    /* loading spinner */
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spin { to { transform: rotate(180deg); } }
     .spinner {
-      width: 18px; height: 18px;
+      width: 16px; height: 16px;
       border: 2px solid var(--border);
       border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
+      border-right-color: var(--accent);
+      animation: spin .8s linear infinite alternate;
       flex-shrink: 0;
     }
-    /* video embed (Teoría) */
+
     .video-embed {
       position: relative;
       width: 100%;
       padding-bottom: 56.25%;
       height: 0;
       overflow: hidden;
-      border-radius: 8px;
+      border-radius: var(--radius);
       border: 1px solid var(--border);
-      margin-top: .5rem;
+      margin-top: .55rem;
     }
-    .video-embed iframe {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      border: 0;
-    }
-    .video-caption {
-      font-size: .72rem;
-      color: var(--muted);
-      margin-top: .4rem;
-    }
+    .video-embed iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+    .video-caption { font-family: var(--mono); font-size: .72rem; color: var(--muted); margin-top: .45rem; }
 
-    /* interactive widgets */
     .interactive-box {
       background: var(--surface);
       border: 1px solid var(--purple);
-      border-radius: 8px;
-      padding: .9rem;
-      margin-top: .75rem;
+      border-radius: var(--radius);
+      padding: 1rem;
+      margin-top: .8rem;
     }
     .interactive-box .interactive-label {
+      font-family: var(--mono);
       font-size: .68rem;
       font-weight: 700;
       color: var(--purple);
       text-transform: uppercase;
-      letter-spacing: .06em;
-      margin-bottom: .6rem;
-      display: flex;
-      align-items: center;
-      gap: .35rem;
+      letter-spacing: .08em;
+      margin-bottom: .65rem;
     }
-    .interactive-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .5rem;
-      align-items: center;
-      margin-bottom: .6rem;
-    }
+    .interactive-row { display: flex; flex-wrap: wrap; gap: .55rem; align-items: center; margin-bottom: .65rem; }
     .interactive-row label {
+      font-family: var(--mono);
       font-size: .7rem;
       color: var(--muted);
       display: flex;
       flex-direction: column;
-      gap: .25rem;
+      gap: .3rem;
     }
     .interactive-box input[type="number"],
     .interactive-box input[type="text"] {
       width: 90px;
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: .4rem .5rem;
+      border-radius: var(--radius);
+      padding: .42rem .55rem;
       color: var(--text);
       font-family: var(--mono);
-      font-size: .78rem;
+      font-size: .8rem;
     }
-    .interactive-box input[type="text"].char-input { width: 50px; text-align: center; }
+    .interactive-box input[type="text"].char-input { width: 52px; text-align: center; }
     .btn-interactive {
-      background: var(--purple-dim);
+      background: transparent;
       border: 1px solid var(--purple);
       color: var(--purple);
-      border-radius: 6px;
-      padding: .4rem .8rem;
-      font-family: var(--sans);
-      font-size: .75rem;
-      font-weight: 600;
+      border-radius: var(--radius);
+      padding: .42rem .85rem;
+      font-family: var(--mono);
+      font-size: .74rem;
+      font-weight: 700;
       cursor: pointer;
       transition: all .15s;
     }
-    .btn-interactive:hover { background: var(--purple); color: #000; }
-    .interactive-result {
-      margin-top: .6rem;
-      font-size: .78rem;
-    }
-    .interactive-note {
-      font-size: .72rem;
-      color: var(--muted);
-      margin-top: .5rem;
-      line-height: 1.5;
-    }
-    .reveal-step {
-      display: inline-block;
-      opacity: .35;
-      transition: opacity .3s;
-    }
-    .reveal-step.revealed { opacity: 1; }
+    .btn-interactive:hover { background: var(--purple); color: #100c26; }
+    .interactive-result { margin-top: .65rem; font-family: var(--mono); font-size: .8rem; }
+    .interactive-note { font-size: .74rem; color: var(--muted); margin-top: .55rem; line-height: 1.55; }
+    .reveal-step { display: inline-block; opacity: .3; transition: opacity .3s; }
+    .reveal-step.revealed { opacity: 1; color: var(--text); }
 
-    /*  Reloj modular (ElGamal)  */
-    .reloj-wrap { margin-top: .85rem; }
-    .reloj-toggle-row {
-      display: flex;
-      justify-content: flex-end;
-      gap: .5rem;
-    }
+    .reloj-wrap { margin-top: .9rem; }
+    .reloj-toggle-row { display: flex; justify-content: flex-end; gap: .5rem; }
     .reloj-svg-container {
       display: none;
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem;
-      margin-top: .6rem;
+      border-radius: var(--radius);
+      padding: 1.05rem;
+      margin-top: .65rem;
     }
-    .reloj-svg-container.visible {
-      display: block;
-      animation: reloj-expand .25s ease-out;
-    }
+    .reloj-svg-container.visible { display: block; animation: reloj-expand .22s ease-out; }
     @keyframes reloj-expand {
       from { opacity: 0; transform: translateY(-6px); }
       to   { opacity: 1; transform: translateY(0); }
     }
     .reloj-svg-container svg { display: block; margin: 0 auto; }
-    .reloj-legend {
+    .reloj-legend { display: flex; flex-wrap: wrap; gap: .55rem 1.1rem; margin-top: .75rem; font-family: var(--mono); font-size: .72rem; color: var(--muted); }
+    .reloj-legend .dot { display: inline-block; width: 8px; height: 8px; margin-right: .35rem; vertical-align: middle; }
+    .reloj-caption { font-size: .76rem; color: var(--muted); margin-top: .65rem; line-height: 1.65; }
+    .reloj-caption b { color: var(--purple); }
+
+    /* ============ INTRO SECTION ============ */
+    .intro-card {
+      flex: 1;
       display: flex;
-      flex-wrap: wrap;
-      gap: .5rem 1rem;
-      margin-top: .7rem;
-      font-size: .7rem;
+      flex-direction: column;
+      padding: 1.9rem 3rem;
+      overflow-y: auto;
+      gap: 1.4rem;
+      border-top: 3px solid var(--purple);
+    }
+    .intro-intro-text h2 {
+      font-family: var(--display);
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: .5rem;
+      letter-spacing: .005em;
+    }
+    .intro-intro-text p {
+      font-size: 1.02rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+      max-width: 760px;
+    }
+    .intro-toggle-row { display: flex; gap: .6rem; }
+    .intro-toggle-btn {
+      padding: .7rem 1.4rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface2);
       color: var(--muted);
+      font-weight: 700;
+      font-size: .92rem;
+      font-family: var(--sans);
+      cursor: pointer;
+      transition: all .18s;
     }
-    .reloj-legend .dot {
+    .intro-toggle-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .intro-toggle-btn:hover:not(.active) { border-color: var(--accent); color: var(--text); }
+
+    .intro-stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.1rem 1.5rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      min-height: 175px;
+    }
+    .intro-escena { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 660px; gap: 1.3rem; }
+    .amigo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .5rem;
+      font-family: var(--sans);
+      font-size: .92rem;
+      font-weight: 700;
+      color: var(--text);
+      width: 140px;
+    }
+    .avatar {
+      width: 62px;
+      height: 62px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,.25);
+    }
+    .etiqueta-clave { font-family: var(--mono); font-size: .68rem; color: var(--muted); text-align: center; line-height: 1.4; }
+    .etiqueta-clave b { color: var(--purple); }
+
+    .canal { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 64px; }
+    .canal::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 0; right: 0;
+      height: 1px;
+      background: repeating-linear-gradient(90deg, var(--border) 0 6px, transparent 6px 12px);
+    }
+    .llave-compartida, .llave-par {
+      position: relative;
+      z-index: 1;
+      font-size: 1.5rem;
+      margin-bottom: .35rem;
+      line-height: 1;
+    }
+    .llave-par { display: flex; gap: .35rem; }
+    .mensaje-viajero {
+      position: absolute;
+      z-index: 2;
+      font-size: 1.4rem;
+      line-height: 1;
+      left: 0;
+      animation: viajar 3.2s ease-in-out infinite;
+    }
+    @keyframes viajar {
+      0%   { left: 0;                  opacity: 1; }
+      45%  { left: calc(100% - 22px);  opacity: 1; }
+      50%  { opacity: 0; }
+      55%  { left: 0;                  opacity: 0; }
+      60%  { opacity: 1; }
+      100% { left: 0;                  opacity: 1; }
+    }
+
+    .intro-explicacion p {
+      font-size: 1rem;
+      color: var(--text-dim);
+      line-height: 1.75;
+      max-width: 760px;
+    }
+    .intro-explicacion p b { color: var(--purple); }
+    .intro-metodo-tag { margin-top: .6rem; font-size: .88rem; color: var(--muted); }
+    .tag-metodo {
       display: inline-block;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      margin-right: .3rem;
-      vertical-align: middle;
+      background: var(--accent-dim);
+      color: var(--accent-2);
+      border: 1px solid var(--border);
+      font-weight: 700;
+      padding: .2rem .7rem;
+      border-radius: var(--radius);
+      font-family: var(--mono);
+      font-size: .8rem;
+      margin: 0 .15rem;
     }
-    .reloj-caption {
+    .intro-cta { max-width: 280px; margin-top: auto; }
+
+    /* ============ FOOTER ============ */
+    footer.main-footer {
+      flex-shrink: 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .55rem 1.2rem;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--mono);
       font-size: .72rem;
       color: var(--muted);
-      margin-top: .6rem;
-      line-height: 1.6;
+      flex-wrap: wrap;
     }
-    .reloj-caption b { color: var(--purple); }
+    .footer-brand { display: flex; align-items: center; gap: .5rem; }
+    .footer-brand b { color: var(--text-dim); letter-spacing: .02em; }
+    .footer-github {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      padding: .32rem .65rem;
+      transition: all .15s;
+    }
+    .footer-github:hover { color: var(--text); border-color: var(--accent); }
+    .footer-github svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .footer-team { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+    .footer-team span { color: var(--text-dim); }
+    .footer-dot { color: var(--border); }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>// CryptoLab</h1>
-    <p>Proyecto de Matemáticas Discretas 2</p>
-  </header>
+  <div class="app-shell">
 
-  <div class="layout">
-
-    <!--  IZQUIERDA: form panel  -->
-    <div class="card panel-form">
-
-      <!-- Método -->
-      <div class="field">
-        <label>Método de cifrado</label>
-        <select id="metodo" class="form-select">
-          <option value="elgamal" selected>ElGamal </option>
-          <option value="rsa">RSA </option>
-          <option value="aes">AES-256 </option>
-        </select>
-      </div>
-
-      <!-- Claves -->
-      <div class="key-box">
-        <div class="key-box-info">
-          <small id="label-clave-publica">Clave pública</small>
-          <span id="info-clave-publica">—</span>
-        </div>
-        <span id="estado-claves" class="badge badge-loading">Cargando…</span>
-      </div>
-
-      <button id="btn-generar-claves" class="btn btn-secondary" onclick="cargarClaves()">
-        Generar nuevas claves
-      </button>
-
-      <!-- Contraseña -->
-      <div class="field">
-        <label>Texto a cifrar</label>
-        <input id="password" type="text" placeholder="Ingresa tu texto/contraseña…" autocomplete="off" />
-      </div>
-
-      <!-- Botón encriptar -->
-      <button id="btn-encriptar" class="btn btn-primary" onclick="encriptar()">
-        Encriptar
-      </button>
-
-      <!-- Resultado cifrado -->
-      <div id="resultado" class="result-box green">
-        <small>Texto cifrado:</small>
-        <div id="resultado-texto" class="value"></div>
-        <button class="btn btn-secondary" style="margin-top:.75rem" onclick="desencriptar()">
-          Desencriptar
-        </button>
-      </div>
-
-      <!-- Resultado descifrado -->
-      <div id="resultado-descifrado-container" class="result-box blue">
-        <small>Texto descifrado:</small>
-        <div id="resultado-descifrado" class="value"></div>
-      </div>
-
-      <!-- Error -->
-      <div id="error" class="error-msg"></div>
-
-    </div>
-
-    <!--  DERECHA: Paso a paso  -->
-    <div class="card panel-steps">
-
-      <div class="steps-header">
-        <h2>Paso a paso</h2>
-        <div class="tab-group">
-          <button class="tab active"        id="tab-teoria"   onclick="cambiarTab('teoria')">Teoría</button>
-          <button class="tab" id="tab-claves"   onclick="cambiarTab('claves')">Claves</button>
-          <button class="tab"        id="tab-cifrado"  onclick="cambiarTab('cifrado')">Cifrado</button>
-          <button class="tab"        id="tab-descifrado" onclick="cambiarTab('descifrado')">Descifrado</button>
+    <header class="main-header">
+      <div class="header-brand">
+        <div class="brand-mark">CL</div>
+        <div class="header-text">
+          <h1>CryptoLab</h1>
+          <p>Aprendizaje de criptografía &middot; Matem&aacute;ticas Discretas II</p>
         </div>
       </div>
+      <nav class="section-switcher">
+        <button class="switch-btn active" id="switch-intro" onclick="mostrarSeccion('intro')">C&oacute;mo funciona</button>
+        <button class="switch-btn" id="switch-app" onclick="mostrarSeccion('app')">Laboratorio</button>
+      </nav>
+    </header>
 
-      <!-- Placeholder -->
-      <div id="steps-placeholder" class="steps-placeholder">
-        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5"
-             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round"
-            d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/>
+    <main class="main-content">
+
+      <section id="seccion-intro" class="seccion active">
+        <div class="card intro-card">
+
+          <div class="intro-intro-text">
+            <h2>&iquest;Qu&eacute; es cifrar un mensaje?</h2>
+            <p>
+              Cifrar es transformar un mensaje para que solo la persona correcta pueda leerlo,
+              incluso si alguien m&aacute;s intercepta el canal por el que viaja. Existen dos
+              grandes estrategias para lograrlo, y las dos est&aacute;n presentes en este
+              laboratorio a trav&eacute;s de tres m&eacute;todos distintos.
+            </p>
+          </div>
+
+          <div class="intro-toggle-row">
+            <button class="intro-toggle-btn active" id="toggle-simetrico" onclick="mostrarModoIntro('simetrico')">
+              Cifrado sim&eacute;trico
+            </button>
+            <button class="intro-toggle-btn" id="toggle-asimetrico" onclick="mostrarModoIntro('asimetrico')">
+              Cifrado asim&eacute;trico
+            </button>
+          </div>
+
+          <div class="intro-stage">
+
+            <div class="intro-escena" id="escena-simetrico">
+              <div class="amigo" id="amigo-ana-sim">
+                <div class="avatar">A</div>
+                <span>Ana</span>
+              </div>
+
+              <div class="canal">
+                <div class="llave-compartida">&#128273;</div>
+                <div class="mensaje-viajero" id="mensaje-sim">&#9993;&#65039;</div>
+              </div>
+
+              <div class="amigo" id="amigo-beto-sim">
+                <div class="avatar">B</div>
+                <span>Beto</span>
+              </div>
+            </div>
+
+            <div class="intro-escena" id="escena-asimetrico" style="display:none;">
+              <div class="amigo" id="amigo-ana-asim">
+                <div class="avatar">A</div>
+                <span>Ana</span>
+                <span class="etiqueta-clave">usa la llave <b>p&uacute;blica</b> de Beto</span>
+              </div>
+
+              <div class="canal">
+                <div class="llave-par">
+                  <span title="P&uacute;blica, la puede tener cualquiera">&#128275;</span>
+                  <span title="Privada, solo la tiene Beto">&#128272;</span>
+                </div>
+                <div class="mensaje-viajero" id="mensaje-asim">&#9993;&#65039;</div>
+              </div>
+
+              <div class="amigo" id="amigo-beto-asim">
+                <div class="avatar">B</div>
+                <span>Beto</span>
+                <span class="etiqueta-clave">abre con su llave <b>privada</b></span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="intro-explicacion" id="intro-explicacion-simetrico">
+            <p>
+              <b>Ana y Beto comparten una &uacute;nica llave secreta</b> antes de escribirse,
+              acordada previamente por un canal seguro. Ana cifra el mensaje con esa llave, y
+              Beto lo descifra con la <b>misma</b> llave. Es un proceso computacionalmente
+              r&aacute;pido y eficiente, ideal para volumenes grandes de datos, pero exige que
+              ambos hayan intercambiado la llave con anterioridad sin que un tercero logre
+              interceptarla &mdash; ese es precisamente el problema que resuelve la
+              criptograf&iacute;a asim&eacute;trica.
+            </p>
+            <p class="intro-metodo-tag">En este laboratorio: <span class="tag-metodo">AES-256</span></p>
+          </div>
+
+          <div class="intro-explicacion" id="intro-explicacion-asimetrico" style="display:none;">
+            <p>
+              <b>Beto genera un par de llaves matem&aacute;ticamente relacionadas</b> mediante
+              operaciones dentro de un grupo: una llave <b>p&uacute;blica</b>, que puede
+              compartir abiertamente con cualquiera, y una llave <b>privada</b>, que jam&aacute;s
+              sale de su poder. Ana toma la llave p&uacute;blica de Beto para cifrar el mensaje,
+              y &uacute;nicamente la llave privada correspondiente puede revertir esa operaci&oacute;n.
+              As&iacute;, nunca fue necesario acordar un secreto de antemano: la seguridad recae
+              en la dificultad de un problema matem&aacute;tico concreto, no en mantener oculto
+              el canal de intercambio.
+            </p>
+            <p class="intro-metodo-tag">En este laboratorio: <span class="tag-metodo">RSA</span> y <span class="tag-metodo">ElGamal</span></p>
+          </div>
+
+          <button class="btn btn-primary intro-cta" onclick="mostrarSeccion('app')">
+            Ir al laboratorio &rarr;
+          </button>
+
+        </div>
+      </section>
+
+      <section id="seccion-app" class="seccion">
+        <div class="layout">
+
+          <div class="card panel-form">
+
+            <div class="field">
+              <label>M&eacute;todo de cifrado</label>
+              <select id="metodo" class="form-select">
+                <option value="elgamal" selected>ElGamal</option>
+                <option value="rsa">RSA</option>
+                <option value="aes">AES-256</option>
+              </select>
+            </div>
+
+            <div class="key-box">
+              <div class="key-box-info">
+                <small id="label-clave-publica">Clave p&uacute;blica</small>
+                <span id="info-clave-publica">&mdash;</span>
+              </div>
+              <span id="estado-claves" class="badge badge-loading">Cargando&hellip;</span>
+            </div>
+
+            <button id="btn-generar-claves" class="btn btn-secondary" onclick="cargarClaves()">
+              Generar nuevas claves
+            </button>
+
+            <div class="field">
+              <label>Texto a cifrar</label>
+              <input id="password" type="text" placeholder="Ingresa tu texto/contrase&ntilde;a&hellip;" autocomplete="off" />
+            </div>
+
+            <button id="btn-encriptar" class="btn btn-primary" onclick="encriptar()">
+              Encriptar
+            </button>
+
+            <div id="resultado" class="result-box green">
+              <small>Texto cifrado</small>
+              <div id="resultado-texto" class="value"></div>
+              <button class="btn btn-secondary" style="margin-top:.75rem" onclick="desencriptar()">
+                Desencriptar
+              </button>
+            </div>
+
+            <div id="resultado-descifrado-container" class="result-box blue">
+              <small>Texto descifrado</small>
+              <div id="resultado-descifrado" class="value"></div>
+            </div>
+
+            <div id="error" class="error-msg"></div>
+
+          </div>
+
+          <div class="layout-resizer" id="layout-resizer"></div>
+
+          <div class="card panel-steps">
+
+            <div class="steps-header">
+              <h2>Paso a paso</h2>
+              <div class="tab-group">
+                <button class="tab"        id="tab-teoria"   onclick="cambiarTab('teoria')">Teor&iacute;a</button>
+                <button class="tab active" id="tab-claves"   onclick="cambiarTab('claves')">Claves</button>
+                <button class="tab"        id="tab-cifrado"  onclick="cambiarTab('cifrado')">Cifrado</button>
+                <button class="tab"        id="tab-descifrado" onclick="cambiarTab('descifrado')">Descifrado</button>
+              </div>
+            </div>
+
+            <div id="steps-placeholder" class="steps-placeholder">
+              <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5"
+                   viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/>
+              </svg>
+              <p>Los pasos aparecer&aacute;n aqu&iacute;<br/>despu&eacute;s de generar las claves o cifrar.</p>
+            </div>
+
+            <div id="step-list" class="step-list"></div>
+
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="main-footer">
+      <div class="footer-brand">
+        <b>CryptoLab</b>
+        <span>- Proyecto de Matem&aacute;ticas Discretas II - Universidad Nacional de Colombia</span>
+      </div>
+      <div class="footer-team">
+        <span>Santiago Amezquita</span>
+        <span class="footer-dot">&middot;</span>
+        <span>Luis Duarte</span>
+        <span class="footer-dot">&middot;</span>
+        <span>Julian Ricardo</span>
+        <span class="footer-dot">&middot;</span>
+        <span>Miguel Suarez</span>
+      </div>
+      <a class="footer-github" href="https://github.com/miguelsrz/cryptolab" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.27-.01-1.17-.02-2.12-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.17.08 1.78 1.2 1.78 1.2 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.56-.29-5.25-1.28-5.25-5.71 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.79 0c2.21-1.49 3.18-1.18 3.18-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.44-2.7 5.42-5.27 5.7.42.36.78 1.08.78 2.17 0 1.57-.01 2.83-.01 3.22 0 .31.21.67.8.56A10.52 10.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"/>
         </svg>
-        <p>Los pasos aparecerán aquí<br/>después de generar las claves o cifrar.</p>
-      </div>
-
-      <!-- Contenedor paso a paso -->
-      <div id="step-list" class="step-list"></div>
-
-    </div>
+        GitHub
+      </a>
+    </footer>
 
   </div>
 
   <script src="./js/script.js"></script>
+  <script>
+    (function () {
+      const layout   = document.querySelector(".layout");
+      const resizer  = document.getElementById("layout-resizer");
+      if (!layout || !resizer) return;
+
+      const MIN_LEFT  = 260;
+      const MIN_RIGHT = 380;
+      let dragging = false;
+
+      function clamp(px) {
+        const total = layout.getBoundingClientRect().width;
+        const max = total - MIN_RIGHT - 14;
+        return Math.min(Math.max(px, MIN_LEFT), Math.max(MIN_LEFT, max));
+      }
+
+      function setLeft(px) {
+        layout.style.setProperty("--left-col", clamp(px) + "px");
+      }
+
+      function onMove(e) {
+        if (!dragging) return;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const rect = layout.getBoundingClientRect();
+        setLeft(clientX - rect.left);
+      }
+
+      function stopDrag() {
+        if (!dragging) return;
+        dragging = false;
+        resizer.classList.remove("dragging");
+        document.body.style.userSelect = "";
+        document.body.style.cursor = "";
+      }
+
+      function startDrag(e) {
+        dragging = true;
+        resizer.classList.add("dragging");
+        document.body.style.userSelect = "none";
+        document.body.style.cursor = "col-resize";
+        e.preventDefault();
+      }
+
+      resizer.addEventListener("mousedown", startDrag);
+      resizer.addEventListener("touchstart", startDrag, { passive: false });
+
+      window.addEventListener("mousemove", onMove);
+      window.addEventListener("touchmove", onMove, { passive: false });
+      window.addEventListener("mouseup", stopDrag);
+      window.addEventListener("touchend", stopDrag);
+
+      resizer.addEventListener("dblclick", () => {
+        layout.style.removeProperty("--left-col");
+      });
+    })();
+  </script>
 </body>
 </html>

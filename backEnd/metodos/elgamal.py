@@ -1,17 +1,17 @@
 """
 metodos/elgamal.py
 
-Cifrado de clave pública ElGamal.
-Interfaz estándar del proyecto:
-  - generar_claves()            → dict con publica, privada, parametros, pasos_claves
-  - encriptar(password, clave)  → dict con encrypted, pasos
-  - desencriptar(cifrado, clave)→ dict con decrypted, pasos
+Cifrado de clave pública ElGamal
 
-Sin dependencias externas: usa solo aritmética modular, igual que rsa.py.
+Interfaz
+  - generar_claves()             , dict con publica, privada, parametros, pasos_claves
+  - encriptar(password, clave)   , dict con encrypted, pasos
+  - desencriptar(cifrado, clave) , dict con decrypted, pasos
+
+Sin dependencias externas ya que solo usa aritmética modular y teoría de grupos finitos
 """
 
 import random
-
 
 # Primalidad
 def es_primo(n: int) -> bool:
@@ -82,11 +82,11 @@ def generar_claves() -> dict:
 
     pasos_claves = [
         {
-            "titulo": "El campo finito 𝔽ₚ y su grupo multiplicativo",
-            "formula": "𝔽ₚ = ℤ/pℤ  →  (ℤ/pℤ)* = {1, 2, ..., p−1}",
+            "titulo": "El grupo multiplicativo modulo p",
+            "formula": "(ℤ/pℤ)* = {1, 2, ..., p−1}",
             "detalle": (
-                "<p class='step-detail'>ElGamal no trabaja sobre todo el campo finito 𝔽ₚ, "
-                "sino sobre el grupo que forman sus elementos distintos de cero bajo la "
+                "<p class='step-detail'>ElGamal trabaja sobre "
+                "el grupo que forman sus elementos distintos de cero bajo la "
                 "multiplicación módulo p: <span class='hl'>(ℤ/pℤ)*</span>.</p>"
                 "<p class='step-detail'>Como p es primo, todo elemento de 1 a p−1 es coprimo "
                 "con p, así que ninguno se pierde al multiplicar: el conjunto es "
@@ -109,7 +109,7 @@ def generar_claves() -> dict:
                 "a·a⁻¹ ≡ 1 (mod p), garantizado por el <b>Pequeño Teorema de Fermat</b>: a^(p−2) ≡ a⁻¹."
                 "</p>"
                 "<p class='step-detail'>Al cumplirse las cuatro, (ℤ/pℤ)* es un <b>grupo abeliano finito</b> "
-                "— la estructura algebraica exacta que ElGamal necesita para que cifrar y descifrar "
+                ", la estructura algebraica exacta que ElGamal necesita para que cifrar y descifrar "
                 "sean operaciones inversas bien definidas.</p>"
             ),
             "valores": {}
@@ -119,20 +119,20 @@ def generar_claves() -> dict:
             "formula": "p ∈ ℙ  →  |(ℤ/pℤ)*| = p − 1",
             "detalle": (
                 f"<p class='step-detail'>Se elige aleatoriamente el primo <b style='color:var(--purple)'>p = {p}</b>. "
-                f"Este primo define el módulo del grupo y, de paso, su orden (cardinalidad): "
+                f"Este primo define el módulo del grupo y, de paso, su orden o cardinalidad: "
                 f"<span class='hl'>|(ℤ/pℤ)*| = p − 1 = {phi}</span> elementos.</p>"
                 f"<p class='step-detail'>Todo lo que sigue (generador, exponentes, dificultad del "
                 f"ataque) depende de este valor.</p>"
             ),
-            "valores": {"p": p, "orden_grupo": phi}
+            "valores": {"p": p, "orden del grupo": phi}
         },
         {
             "titulo": "Grupo cíclico y elemento generador",
             "formula": "(ℤ/pℤ)* es cíclico  ⟺  ∃ g : ⟨g⟩ = (ℤ/pℤ)*",
             "detalle": (
                 "<p class='step-detail'>Un resultado clásico de teoría de grupos garantiza que "
-                "(ℤ/pℤ)* es siempre <b>cíclico</b>: existe al menos un elemento g, llamado "
-                "<span class='hl'>generador o raíz primitiva</span>, cuyas potencias "
+                "(ℤ/pℤ)* es siempre <b>cíclico</b>. Existe al menos un elemento g, llamado "
+                "<span class='hl'>generador</span>, cuyas potencias "
                 "g¹, g², g³, ..., g^(p−1) recorren TODOS los elementos de {1, ..., p−1} sin "
                 "repetir antes de volver a 1.</p>"
                 "<p class='step-detail'>Ese subconjunto generado por g, denotado ⟨g⟩, coincide "
@@ -143,32 +143,32 @@ def generar_claves() -> dict:
             "valores": {}
         },
         {
-            "titulo": "Encontrar un generador g (raíz primitiva) — Teorema de Lagrange",
+            "titulo": "Encontrar un generador g, el Teorema de Lagrange",
             "formula": "g es generador  ⟺  g^(φ/q) ≠ 1 (mod p)  ∀ primo q | φ",
             "detalle": (
-                f"<p class='step-detail'>Buscar un generador exhaustivamente (probando el orden "
-                f"real de cada candidato) sería costoso. En su lugar se usa el "
+                f"<p class='step-detail'>Buscar un generador exhaustivamente "
+                f"sería costoso. En su lugar se usa el "
                 f"<b>Teorema de Lagrange</b>: en un grupo finito, el orden de cualquier elemento "
                 f"debe dividir al orden del grupo, <span class='hl'>φ = p−1 = {phi}</span>.</p>"
                 f"<p class='step-detail'>Por lo tanto, si g NO genera todo el grupo, su orden es "
                 f"necesariamente un divisor propio de φ, expresable como φ/q para algún primo q "
                 f"que divide a φ. Basta factorizar φ y verificar que g^(φ/q) ≠ 1 (mod p) para cada "
-                f"uno: si ninguna potencia colapsa a 1, g genera todo el grupo. "
-                f"Generador encontrado: <b style='color:var(--purple)'>g = {g}</b>.</p>"
+                f"uno. Si ninguna potencia colapsa a 1, g genera todo el grupo. "
+                f"Se halla el generador: <b style='color:var(--purple)'>g = {g}</b>.</p>"
             ),
             "valores": {"g": g}
         },
         {
-            "titulo": "Elegir clave privada x — el Problema del Logaritmo Discreto",
+            "titulo": "Elegir clave privada x, el Problema del Logaritmo Discreto",
             "formula": "x ∈ [2, p−2]  (secreto, uniformemente aleatorio)",
             "detalle": (
                 f"<p class='step-detail'>Se elige aleatoriamente el entero secreto "
-                f"<b style='color:var(--purple)'>x = {x}</b>: el exponente que solo conoce el "
+                f"<b style='color:var(--purple)'>x = {x}</b>, el exponente que solo conoce el "
                 f"receptor. Su seguridad no depende de ocultar un algoritmo, sino de una "
                 f"asimetría computacional real.</p>"
-                f"<p class='step-detail'>Calcular y = gˣ mod p es rápido (exponenciación modular, "
-                f"O(log x) multiplicaciones), pero recuperar x conociendo únicamente g, p y y "
-                f"—el <span class='hl'>Problema del Logaritmo Discreto (PLD)</span>— no tiene un "
+                f"<p class='step-detail'>Calcular y = gˣ mod p es rápido (exponenciación modular, es decir "
+                f"O(log x) multiplicaciones), pero recuperar x conociendo únicamente y, p y g "
+                f"(el <span class='hl'>Problema del Logaritmo Discreto (PLD)</span>) no tiene un "
                 f"algoritmo eficiente conocido para p grande. Toda la seguridad de ElGamal se "
                 f"reduce, en última instancia, a la dificultad de este problema sobre el grupo "
                 f"cíclico (ℤ/pℤ)*.</p>"
@@ -190,7 +190,7 @@ def generar_claves() -> dict:
             "formula": "Pública: (p, g, y)  |  Privada: (p, x)",
             "detalle": (
                 f"<p class='step-detail'>Clave <span class='hl-green'>pública</span>: "
-                f"(p={p}, g={g}, y={y}) — Clave <span class='hl'>privada</span>: (p={p}, x={x})</p>"
+                f"(p={p}, g={g}, y={y}) | Clave <span class='hl'>privada</span>: (p={p}, x={x})</p>"
             ),
             "valores": {"publica": f"(p={p}, g={g}, y={y})", "privada": f"(p={p}, x={x})"}
         },
@@ -243,7 +243,7 @@ def encriptar(password: str, clave_publica: dict) -> dict:
                 f"c₁ = g^k mod p = {g}^{k} mod {p} = {c1} actúa como la 'huella pública' del "
                 f"secreto efímero k, expresada dentro del mismo grupo cíclico. "
                 f"El secreto compartido efímero es y^k mod p = {y}^{k} mod {p} = {yk} "
-                f"(nótese que y^k = (g^x)^k = (g^k)^x = c1^x — esta igualdad es la que permite "
+                f"(nótese que y^k = (g^x)^k = (g^k)^x = c1^x , esta igualdad es la que permite "
                 f"reconstruir y^k en el descifrado sin conocer k). "
                 f"Finalmente c₂ = m × y^k mod p = {m} × {yk} mod {p} = {c2} 'enmascara' el "
                 f"mensaje multiplicándolo por ese secreto compartido dentro del grupo."
@@ -275,15 +275,15 @@ def desencriptar(cifrado: list, clave_privada: dict) -> dict:
             "m": m,
             "caracter": caracter,
             "detalle": (
-                f"Paso 1 — Reconstruir el secreto compartido sin conocer k: "
+                f"Paso 1 , Reconstruir el secreto compartido sin conocer k: "
                 f"s = c₁ˣ mod p = {c1}^{x} mod {p} = {s}. "
                 f"Esto funciona porque c₁ = gᵏ, entonces c₁ˣ = (gᵏ)ˣ = (gˣ)ᵏ = yᵏ: "
                 f"el receptor llega al mismo valor y^k que usó quien cifró, solo que aplicando "
                 f"su exponente secreto x sobre c₁ en vez de aplicar k sobre y. "
-                f"Paso 2 — Invertir el secreto compartido dentro del grupo (ℤ/pℤ)*: "
+                f"Paso 2 , Invertir el secreto compartido dentro del grupo (ℤ/pℤ)*: "
                 f"como todo elemento del grupo tiene inverso multiplicativo único, se calcula "
                 f"s⁻¹ = {s_inv} (aquí, vía Fermat: s^(p−2) mod p). "
-                f"Paso 3 — Cancelar el enmascaramiento: "
+                f"Paso 3 , Cancelar el enmascaramiento: "
                 f"m = c₂ × s⁻¹ mod p = {c2} × {s_inv} mod {p} = {m}. "
                 f"Como c₂ = m × yᵏ, al multiplicar por (yᵏ)⁻¹ el factor se cancela algebraicamente "
                 f"(yᵏ × (yᵏ)⁻¹ ≡ 1) y queda expuesto el mensaje original m, que corresponde al "
