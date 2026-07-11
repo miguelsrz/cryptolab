@@ -310,7 +310,7 @@
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%238a84ab'%3E%3Cpath d='M5 7l5 5 5-5H5z'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
       background-position: right .8rem center;
-      padding-right: 2.2rem;
+      padding-right: 4.0rem;
     }
     select:focus, input[type="text"]:focus {
       border-color: var(--accent);
@@ -988,9 +988,9 @@
               <b>Ana y Beto comparten una &uacute;nica llave secreta</b> antes de escribirse,
               acordada previamente por un canal seguro. Ana cifra el mensaje con esa llave, y
               Beto lo descifra con la <b>misma</b> llave. Es un proceso computacionalmente
-              r&aacute;pido y eficiente, ideal para volumenes grandes de datos, pero exige que
+              r&aacute;pido y eficiente, ideal para volumenes grandes de datos pero exige que
               ambos hayan intercambiado la llave con anterioridad sin que un tercero logre
-              interceptarla &mdash; ese es precisamente el problema que resuelve la
+              interceptarla, este problema es resuelto por la
               criptograf&iacute;a asim&eacute;trica.
             </p>
             <p class="intro-metodo-tag">En este laboratorio: <span class="tag-metodo">AES-256</span></p>
@@ -999,11 +999,11 @@
           <div class="intro-explicacion" id="intro-explicacion-asimetrico" style="display:none;">
             <p>
               <b>Beto genera un par de llaves matem&aacute;ticamente relacionadas</b> mediante
-              operaciones dentro de un grupo: una llave <b>p&uacute;blica</b>, que puede
+              operaciones dentro de un grupo. Una llave <b>p&uacute;blica</b>, que puede
               compartir abiertamente con cualquiera, y una llave <b>privada</b>, que jam&aacute;s
               sale de su poder. Ana toma la llave p&uacute;blica de Beto para cifrar el mensaje,
               y &uacute;nicamente la llave privada correspondiente puede revertir esa operaci&oacute;n.
-              As&iacute;, nunca fue necesario acordar un secreto de antemano: la seguridad recae
+              As&iacute;, no fue necesario acordar un secreto de antemano ya que la seguridad recae
               en la dificultad de un problema matem&aacute;tico concreto, no en mantener oculto
               el canal de intercambio.
             </p>

@@ -458,7 +458,7 @@ function renderTeoria(metodo) {
         body: `
           <p class="step-detail">
             Toda la seguridad de RSA se reduce a esta asimetría: calcular n = p·q es
-            <b>rápido</b>, pero el proceso inverso — encontrar p y q conociendo solo n — <b>no
+            <b>rápido</b>, pero el proceso inverso de encontrar p y q conociendo solo n, <b>no
             tiene un algoritmo eficiente conocido</b> para n suficientemente grande (miles de
             bits).
           </p>
@@ -623,7 +623,7 @@ function renderTeoria(metodo) {
           </p>
           <p class="step-detail">
             Esto hace que cifrar el mismo mensaje dos veces con la misma clave, pero distinto
-            IV, produzca resultados completamente distintos — la misma seguridad semántica que
+            IV, produzca resultados completamente distintos, la misma seguridad semántica que
             ElGamal logra con su exponente k aleatorio, pero resuelta aquí encadenando bloques
             en vez de aleatorizando cada cifrado desde cero.
           </p>
@@ -874,7 +874,7 @@ function renderPasosCifrado(pasos, metodo) {
               </div>
               <div class="reloj-svg-container" id="reloj-cifrado-container">
                 <p class="reloj-caption" style="margin-top:0;">
-                  Grupo <b>ℤ<sub>${pPub}</sub><sup>*</sup></b>/ El reloj representa este grupo cíclico completo
+                  Grupo <b>ℤ<sub>${pPub}</sub><sup>*</sup></b>. El reloj representa este grupo cíclico completo
                   (p=${pPub} posiciones), aunque solo se marcan los puntos de los caracteres
                   que cifres.
                 </p>
@@ -1655,9 +1655,9 @@ function prepararRevelado() {
   const elS = document.getElementById("reveal-s");
   const elSinv = document.getElementById("reveal-sinv");
   const elM = document.getElementById("reveal-m");
-  if (elS)    elS.innerHTML    = `s = c₁ˣ mod p = —`;
-  if (elSinv) elSinv.innerHTML = `s⁻¹ = —`;
-  if (elM)    elM.innerHTML    = `m = c₂ · s⁻¹ mod p = — → carácter: —`;
+  if (elS)    elS.innerHTML    = `s = c₁ˣ mod p = ...`;
+  if (elSinv) elSinv.innerHTML = `s⁻¹ = ...`;
+  if (elM)    elM.innerHTML    = `m = c₂ · s⁻¹ mod p = ... → carácter: ...`;
 }
 
 function revelarPaso(numero) {
