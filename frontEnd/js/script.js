@@ -783,7 +783,7 @@ function renderPasosCifrado(pasos, metodo) {
     const items = [
       {
         num: 1,
-        titulo: "1. El grupo cíclico donde ocurre el cifrado",
+        titulo: "El grupo cíclico donde ocurre el cifrado",
         formula: `p=${pPub}, g=${gPub}, y=${yPub}`,
         body: `
           ${resumenTexto}
@@ -805,7 +805,7 @@ function renderPasosCifrado(pasos, metodo) {
       },
       {
         num: 2,
-        titulo: "2. Calcular c₁, la huella pública",
+        titulo: "Calcular c₁, la huella pública",
         formula: "c₁ = gᵏ mod p",
         body: `
           <p class="step-detail">
@@ -818,7 +818,7 @@ function renderPasosCifrado(pasos, metodo) {
       },
       {
         num: 3,
-        titulo: "3. Calcular el 'secreto compartido' yᵏ y enmascarar el mensaje",
+        titulo: "Calcular el 'secreto compartido' yᵏ y enmascarar el mensaje",
         formula: "yᵏ mod p   →   c₂ = m · yᵏ mod p",
         body: `
           <p class="step-detail">
@@ -840,6 +840,12 @@ function renderPasosCifrado(pasos, metodo) {
       },
       {
         num: 4,
+        titulo: `Cifrado carácter a carácter (${pasos.length} carácter${pasos.length !== 1 ? "es" : ""})`,
+        formula: `p=${sesion.clave_publica?.p}, g=${sesion.clave_publica?.g}, y=${sesion.clave_publica?.y}`,
+        body: renderTablaElGamalCifrado(pasos),
+      },
+      {
+        num: 5,
         titulo: "Interactivo: cifra el mismo carácter con distintos k",
         formula: "",
         body: `
@@ -902,13 +908,7 @@ function renderPasosCifrado(pasos, metodo) {
             </div>
           </div>
         `,
-      },
-      {
-        num: 5,
-        titulo: `Cifrado carácter a carácter (${pasos.length} carácter${pasos.length !== 1 ? "es" : ""})`,
-        formula: `p=${sesion.clave_publica?.p}, g=${sesion.clave_publica?.g}, y=${sesion.clave_publica?.y}`,
-        body: renderTablaElGamalCifrado(pasos),
-      },
+      }
     ];
     renderStepList(items);
   }
@@ -969,7 +969,7 @@ function renderPasosDescifrado(pasos, metodo) {
     const items = [
       {
         num: 1,
-        titulo: "1. Reconstruir el 'secreto compartido' sin conocer k",
+        titulo: "Reconstruir el 'secreto compartido' sin conocer k",
         formula: `s = c₁^${xPriv ?? "x"} mod ${pPriv ?? "p"}`,
         body: `
           ${resumenTexto}
@@ -984,7 +984,7 @@ function renderPasosDescifrado(pasos, metodo) {
       },
       {
         num: 2,
-        titulo: "2. Invertir el secreto dentro del grupo ℤ*ₚ",
+        titulo: "Invertir el secreto dentro del grupo ℤ*ₚ",
         formula: `s⁻¹ ≡ s^(${pPriv ? pPriv + "−2" : "p−2"}) mod ${pPriv ?? "p"}`,
         body: `
           <p class="step-detail">
@@ -998,7 +998,7 @@ function renderPasosDescifrado(pasos, metodo) {
       },
       {
         num: 3,
-        titulo: "3. Cancelar el 'enmascaramiento' y recuperar el mensaje",
+        titulo: "Cancelar el 'enmascaramiento' y recuperar el mensaje",
         formula: "m = c₂ · s⁻¹ mod p",
         body: `
           <p class="step-detail">
@@ -1011,6 +1011,12 @@ function renderPasosDescifrado(pasos, metodo) {
       },
       {
         num: 4,
+        titulo: `Descifrado carácter a carácter (${pasos.length})`,
+        formula: `p=${sesion.clave_privada?.p}, x=${sesion.clave_privada?.x}`,
+        body: renderTablaElGamalDescifrado(pasos),
+      },
+      {
+        num: 5,
         titulo: "Interactivo: revela la cancelación algebraica paso a paso",
         formula: "",
         body: `
@@ -1037,13 +1043,7 @@ function renderPasosDescifrado(pasos, metodo) {
             </div>
           </div>
         `,
-      },
-      {
-        num: 5,
-        titulo: `Descifrado carácter a carácter (${pasos.length})`,
-        formula: `p=${sesion.clave_privada?.p}, x=${sesion.clave_privada?.x}`,
-        body: renderTablaElGamalDescifrado(pasos),
-      },
+      }
     ];
     renderStepList(items);
 

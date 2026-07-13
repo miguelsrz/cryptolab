@@ -82,39 +82,6 @@ def generar_claves() -> dict:
 
     pasos_claves = [
         {
-            "titulo": "El grupo multiplicativo modulo p",
-            "formula": "(ℤ/pℤ)* = {1, 2, ..., p−1}",
-            "detalle": (
-                "<p class='step-detail'>ElGamal trabaja sobre "
-                "el grupo que forman sus elementos distintos de cero bajo la "
-                "multiplicación módulo p: <span class='hl'>(ℤ/pℤ)*</span>.</p>"
-                "<p class='step-detail'>Como p es primo, todo elemento de 1 a p−1 es coprimo "
-                "con p, así que ninguno se pierde al multiplicar: el conjunto es "
-                "<b>cerrado</b> bajo esta operación. Este conjunto con la multiplicación mod p "
-                "es el grupo sobre el que se construye toda la seguridad del esquema.</p>"
-            ),
-            "valores": {}
-        },
-        {
-            "titulo": "Verificación de los axiomas de grupo",
-            "formula": "(G, ·) es grupo ⟺ cierre, asociatividad, neutro, inversos",
-            "detalle": (
-                "<p class='step-detail'>Para que (ℤ/pℤ)* sea formalmente un <b>grupo</b> bajo "
-                "· (multiplicación mod p) deben cumplirse cuatro propiedades:</p>"
-                "<p class='step-detail'>"
-                "<span class='hl-green'>1. Cierre:</span> a·b mod p siempre cae de nuevo en {1,...,p−1}."
-                "<br/><span class='hl-green'>2. Asociatividad:</span> (a·b)·c ≡ a·(b·c) (mod p), heredada de ℤ."
-                "<br/><span class='hl-green'>3. Elemento neutro:</span> existe 1 tal que a·1 ≡ a (mod p)."
-                "<br/><span class='hl-green'>4. Inversos:</span> para todo a existe un único a⁻¹ tal que "
-                "a·a⁻¹ ≡ 1 (mod p), garantizado por el <b>Pequeño Teorema de Fermat</b>: a^(p−2) ≡ a⁻¹."
-                "</p>"
-                "<p class='step-detail'>Al cumplirse las cuatro, (ℤ/pℤ)* es un <b>grupo abeliano finito</b> "
-                ", la estructura algebraica exacta que ElGamal necesita para que cifrar y descifrar "
-                "sean operaciones inversas bien definidas.</p>"
-            ),
-            "valores": {}
-        },
-        {
             "titulo": "Elegir un primo grande p (orden del grupo)",
             "formula": "p ∈ ℙ  →  |(ℤ/pℤ)*| = p − 1",
             "detalle": (
