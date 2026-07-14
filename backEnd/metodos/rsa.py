@@ -9,11 +9,9 @@ Interfaz estándar que todo método debe cumplir:
 
 import random
 
+#  ------------------ Primalidad ------------------
 
-# ─────────────────────────────────────────────
-# Primalidad
-# ─────────────────────────────────────────────
-
+# Comprueba si un número es primo (división por tentativa hasta raíz cuadrada)
 def es_primo(n):
     if n < 2:
         return False
@@ -26,39 +24,38 @@ def es_primo(n):
             return False
     return True
 
+# Genera un primo aleatorio en el rango [minimo, maximo]
 def primo_aleatorio(minimo=200, maximo=1000):
     while True:
         candidato = random.randint(minimo, maximo)
         if es_primo(candidato):
             return candidato
 
+# ------------------ Algoritmo de Euclides ------------------
 
-# ─────────────────────────────────────────────
-# Algoritmo de Euclides
-# ─────────────────────────────────────────────
-
+# Máximo común divisor (Euclides iterativo)
 def mcd(a, b):
     while b:
         a, b = b, a % b
     return a
 
+# Algoritmo de Euclides extendido: devuelve (g, x, y) tal que a*x + b*y = g = mcd(a,b)
 def euclides_extendido(a, b):
     if b == 0:
         return a, 1, 0
     g, x1, y1 = euclides_extendido(b, a % b)
     return g, y1, x1 - (a // b) * y1
 
+# Inverso modular de e módulo phi (usando Euclides extendido)
 def inverso_modular(e, phi):
     g, x, _ = euclides_extendido(e, phi)
     if g != 1:
         raise ValueError(f"Inverso modular no existe: mcd({e},{phi})={g}")
     return x % phi
 
+# ------------------ Exponenciación modular ------------------
 
-# ─────────────────────────────────────────────
-# Exponenciación modular
-# ─────────────────────────────────────────────
-
+# Exponenciación binaria rápida: calcula (base^exp) % mod de forma eficiente
 def potencia_modular(base, exp, mod):
     resultado = 1
     base = base % mod
@@ -69,25 +66,26 @@ def potencia_modular(base, exp, mod):
         base = (base * base) % mod
     return resultado
 
-
-# ─────────────────────────────────────────────
-# Interfaz estándar
-# ─────────────────────────────────────────────
+# ------------------ Interfaz estándar ------------------
 
 def generar_claves():
+    # Generar dos primos distintos y con producto suficientemente grande
+    # Se asegura que n > 65536 para poder cifrar caracteres Unicode básicos
     while True:
         p = primo_aleatorio(200, 1000)
         q = primo_aleatorio(200, 1000)
         if p != q and p * q > 65536:
             break
 
-    n   = p * q
-    phi = (p - 1) * (q - 1)
-    e   = 3
+    n   = p * q                     # Módulo público
+    phi = (p - 1) * (q - 1)         # Función de Euler
+    e   = 3                         # Exponente público (común por eficiencia)
+    # Asegurar que e sea coprimo con phi
     while mcd(e, phi) != 1:
         e += 2
-    d = inverso_modular(e, phi)
+    d = inverso_modular(e, phi)     # Exponente privado (inverso de e módulo phi)
 
+    # Pasos didácticos para mostrar en el frontend
     pasos_claves = [
         {
             "titulo": "Elegir dos primos grandes",
@@ -136,19 +134,21 @@ def generar_claves():
 
 
 def encriptar(password: str, clave_publica: dict) -> dict:
+    # Extraer clave pública
     e = int(clave_publica["e"])
     n = int(clave_publica["n"])
     cifrado = []
     pasos = []
 
+    # Cifrar cada carácter por separado (cifrado de bloque elemental)
     for caracter in password:
-        m = ord(caracter)
+        m = ord(caracter)                # Convertir carácter a su código numérico
         if m >= n:
             raise ValueError(
                 f"El carácter '{caracter}' (unicode={m}) supera n={n}. "
                 "Genera claves más grandes."
             )
-        c = potencia_modular(m, e, n)
+        c = potencia_modular(m, e, n)    # c = m^e mod n
         cifrado.append(c)
         pasos.append({
             "caracter": caracter,
@@ -162,14 +162,16 @@ def encriptar(password: str, clave_publica: dict) -> dict:
 
 
 def desencriptar(cifrado: list, clave_privada: dict) -> dict:
+    # Extraer clave privada
     d = int(clave_privada["d"])
     n = int(clave_privada["n"])
     pasos = []
     texto = ""
 
+    # Descifrar cada número del bloque cifrado
     for c in cifrado:
-        m = potencia_modular(c, d, n)
-        caracter = chr(m)
+        m = potencia_modular(c, d, n)    # m = c^d mod n
+        caracter = chr(m)                # Convertir número a carácter
         texto += caracter
         pasos.append({
             "cifrado": c,

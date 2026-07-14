@@ -16,9 +16,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 
 
-# ─────────────────────────────────────────────
-# Interfaz estándar
-# ─────────────────────────────────────────────
+# ------------ interfaz estandar  ------------
 
 def generar_claves():
     """
@@ -87,26 +85,29 @@ def generar_claves():
 
 
 def encriptar(password: str, clave_publica: dict) -> dict:
+    # Convertir clave hexadecimal a byte
     key = bytes.fromhex(clave_publica["key"])
     iv  = os.urandom(16)
 
-    # Padding PKCS7
+    # Aplicar padding PKCS#7 para que los datos sean múltiplo de 16
     padder      = padding.PKCS7(128).padder()
     datos       = password.encode("utf-8")
     datos_pad   = padder.update(datos) + padder.finalize()
 
     bytes_añadidos = len(datos_pad) - len(datos)
 
+     # Configurar cifrador AES en modo CBC
     cipher    = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
     encryptor = cipher.encryptor()
     ct        = encryptor.update(datos_pad) + encryptor.finalize()
 
-    # Bloques cifrados para el paso a paso
+    # Dividir el texto cifrado en bloques de 16 bytes para la presentación
     bloques = []
     for i in range(0, len(ct), 16):
         bloque_hex = ct[i:i+16].hex()
         bloques.append(bloque_hex)
 
+    # Construir los pasos para el frontend
     pasos = [
         {
             "titulo": "Texto original",
@@ -149,14 +150,17 @@ def encriptar(password: str, clave_publica: dict) -> dict:
 
 
 def desencriptar(cifrado: dict, clave_privada: dict) -> dict:
+    # Extraer clave, IV y texto cifrado
     key = bytes.fromhex(clave_privada["key"])
     iv  = bytes.fromhex(cifrado["iv"])
     ct  = bytes.fromhex(cifrado["ct"])
 
+    # Descifrar
     cipher    = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
     decryptor = cipher.decryptor()
     datos_pad = decryptor.update(ct) + decryptor.finalize()
 
+     # Quitar el padding
     unpadder = padding.PKCS7(128).unpadder()
     datos    = unpadder.update(datos_pad) + unpadder.finalize()
 

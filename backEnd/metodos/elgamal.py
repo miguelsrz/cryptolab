@@ -13,7 +13,7 @@ Sin dependencias externas ya que solo usa aritmética modular y teoría de grupo
 
 import random
 
-# Primalidad
+# --------------- Primalidad ---------------
 def es_primo(n: int) -> bool:
     if n < 2:
         return False
@@ -34,7 +34,7 @@ def primo_aleatorio(minimo: int = 10_000, maximo: int = 50_000) -> int:
             return candidato
 
 
-# Aritmética modular
+# --------------- Aritmética modular ---------------
 def potencia_modular(base: int, exp: int, mod: int) -> int:
     resultado = 1
     base = base % mod
@@ -50,7 +50,7 @@ def inverso_modular(a: int, p: int) -> int:
     return potencia_modular(a, p - 2, p)
 
 
-# Generador. Raíz primitiva mod p
+# --------------- Generador. Raíz primitiva mod p ---------------
 def encontrar_generador(p: int) -> int:
     phi = p - 1
     factores = set()
@@ -64,6 +64,7 @@ def encontrar_generador(p: int) -> int:
     if temp > 1:
         factores.add(temp)
 
+    # Probar candidatos desde 2 hasta encontrar uno que cumpla g^(phi/q) != 1 para todo q primo | phi
     for g in range(2, p):
         if all(potencia_modular(g, phi // q, p) != 1 for q in factores):
             return g
@@ -71,12 +72,12 @@ def encontrar_generador(p: int) -> int:
 
 
 
-# Interfaz estándar
+# --------------- Interfaz estándar ---------------
 def generar_claves() -> dict:
     p = primo_aleatorio(10_000, 50_000)
     g = encontrar_generador(p)
-    x = random.randint(2, p - 2)
-    y = potencia_modular(g, x, p)
+    x = random.randint(2, p - 2)        # clave privada
+    y = potencia_modular(g, x, p)       # clave publica
 
     phi = p - 1  # orden del grupo (ℤ/pℤ)*
 
@@ -164,7 +165,7 @@ def generar_claves() -> dict:
     ]
 
     return {
-        "publica":      {"p": p, "g": g, "y": y},
+        "publica":      {"p": p, "g": g, "y": y}, 
         "privada":      {"p": p, "x": x},
         "parametros":   {"p": p, "g": g, "x": x, "y": y},
         "pasos_claves": pasos_claves,
@@ -186,10 +187,10 @@ def encriptar(password: str, clave_publica: dict) -> dict:
                 f"El carácter '{caracter}' (unicode={m}) supera p={p}. "
                 "Genera claves más grandes."
             )
-        k  = random.randint(2, p - 2)
-        c1 = potencia_modular(g, k, p)
-        yk = potencia_modular(y, k, p)
-        c2 = (m * yk) % p
+        k  = random.randint(2, p - 2)          # efímero
+        c1 = potencia_modular(g, k, p)        # g^k mod p
+        yk = potencia_modular(y, k, p)        # y^k mod p (secreto compartido)
+        c2 = (m * yk) % p                     # m * y^k mod p
 
         cifrado.append([c1, c2])
         pasos.append({
@@ -228,9 +229,9 @@ def desencriptar(cifrado: list, clave_privada: dict) -> dict:
     pasos = []
 
     for c1, c2 in cifrado:
-        s     = potencia_modular(c1, x, p)
-        s_inv = inverso_modular(s, p)
-        m     = (c2 * s_inv) % p
+        s     = potencia_modular(c1, x, p)    # (g^k)^x = g^(kx) = y^k
+        s_inv = inverso_modular(s, p)         # inverso de s en el grupo
+        m     = (c2 * s_inv) % p              # m = c2 * s^{-1}
         caracter = chr(m)
         texto += caracter
         pasos.append({

@@ -1,38 +1,20 @@
 """
 metodos/reloj_modular.py
 
-Genera los datos necesarios para que el FRONTEND dibuje un "reloj modular"
-que representa el grupo cíclico (ℤ/pℤ)* y el generador g de ElGamal.
+Este módulo calcula los datos numéricos y de texto para que el frontend pueda 
+dibujar un "reloj modular" (el grupo cíclico para ElGamal)
 
-Este módulo NO genera imágenes ni HTML: solo arma un dict con toda la
-información numérica y textual ya calculada, lista para json.dumps().
-El frontend (Canvas/SVG/D3, etc.) se encarga de dibujar el reloj a partir
-de este JSON.
+¿Por qué calculamos DOS relojes?
+1. Reloj Didáctico: Usa un número primo pequeño (ej. p=23) para que el usuario 
+   pueda ver el reloj completo en pantalla y entender visualmente cómo el 
+   generador 'g' recorre todos los puntos.
+2. Reloj Real: Con primos gigantescos (como p=50,000 en la pagina), dibujar todo 
+   es imposible. Así que para este reloj solo calculamos donde deberia estar el
+   punto y lo agregamos para dar una forma mas visual de ver que el cifrado
+   es probabilistico y donde caen los numeros cifrados en el grupo
 
-────────────────────────────────────────────────────────────────
-¿Por qué DOS relojes?
-────────────────────────────────────────────────────────────────
-En producción, p de ElGamal puede ser hasta ~50.000. Dibujar un reloj con
-50.000 marcas no comunica nada (no se ve nada, no se puede seguir la
-animación). Por eso este módulo entrega:
-
-  1. "reloj_didactico": un grupo pequeño (p chico, ej. 23) generado
-     on-the-fly SOLO para fines visuales. Aquí sí se puede pintar el
-     reloj completo con las p-1 posiciones y ver cómo el generador g
-     "recorre" todas ellas antes de volver a 1. Este reloj es el que
-     enseña el concepto de grupo cíclico y generador.
-
-  2. "reloj_real": usa el p, g, x, y REALES de la clave que ya generó
-     elgamal.generar_claves(). Como no se puede pintar cada punto,
-     se muestrean solo los primeros N pasos de la órbita de g
-     (por defecto 12) más los puntos relevantes del cifrado
-     (k, c1 = g^k mod p, y^k mod p, c2). El reloj real se dibuja como
-     un círculo con marcas solo en los ángulos de esos puntos
-     muestreados, indicando "..." para el resto del grupo.
-
-Ambos comparten el mismo esquema de "puntos" para que el frontend use
-un solo componente de dibujo para los dos casos.
-────────────────────────────────────────────────────────────────
+Ambos devuelven la misma estructura de datos para que el frontend use el mismo 
+componente para dibujarlos.
 """
 
 import math
@@ -59,7 +41,6 @@ def _angulo_para(posicion: int, modulo_visual: int) -> float:
     fraccion = (posicion % modulo_visual) / modulo_visual
     return (fraccion * 360.0) - 90.0  # -90 para que la posición 0 quede arriba
 
-
 def _punto_en_circulo(angulo_grados: float, radio: float = 1.0):
     rad = math.radians(angulo_grados)
     return {"x": round(radio * math.cos(rad), 4), "y": round(radio * math.sin(rad), 4)}
@@ -74,7 +55,6 @@ def _generar_grupo_pequeno(minimo: int = 11, maximo: int = 30) -> int:
     candidatos = [n for n in range(minimo, maximo + 1) if es_primo(n)]
     return random.choice(candidatos)
 
-
 def construir_reloj_didactico(p: int = None) -> dict:
     """
     Construye el reloj completo de un grupo (ℤ/pℤ)* pequeño, mostrando:
@@ -82,9 +62,6 @@ def construir_reloj_didactico(p: int = None) -> dict:
       - El generador g encontrado
       - La órbita COMPLETA de g: g¹, g², g³, ... hasta volver a 1
       - Un candidato que NO es generador, para contraste (opcional)
-
-    Devuelve un dict serializable a JSON con toda la info que el
-    frontend necesita para dibujar el reloj y animar la órbita.
     """
     if p is None:
         p = _generar_grupo_pequeno()
@@ -105,7 +82,7 @@ def construir_reloj_didactico(p: int = None) -> dict:
             "punto": _punto_en_circulo(_angulo_para(valor, p)),
         })
 
-    # Buscar un NO-generador para contraste didáctico (si existe alguno != g)
+    # Buscar un NO-generador para contraste didáctico
     no_generador = None
     for candidato in range(2, p):
         if candidato == g:
@@ -123,7 +100,7 @@ def construir_reloj_didactico(p: int = None) -> dict:
             }
             break
 
-    # Todas las marcas del reloj (1..p-1), para dibujar el círculo completo
+    # Todas las marcas del reloj (1..p-1)
     marcas = []
     for posicion in range(1, p):
         marcas.append({
@@ -137,8 +114,8 @@ def construir_reloj_didactico(p: int = None) -> dict:
         "p": p,
         "phi": phi,
         "g": g,
-        "marcas": marcas,              # las p-1 posiciones del reloj
-        "orbita_generador": orbita,    # secuencia completa g^1..g^phi
+        "marcas": marcas,
+        "orbita_generador": orbita,
         "no_generador_ejemplo": no_generador,
         "explicacion": (
             f"Este reloj de {phi} posiciones representa el grupo cíclico "
@@ -148,10 +125,8 @@ def construir_reloj_didactico(p: int = None) -> dict:
         ),
     }
 
-
 def _orden_de_elemento(a: int, p: int, phi: int) -> int:
-    """Menor k>0 tal que a^k ≡ 1 (mod p). Útil solo para el ejemplo didáctico
-    (grupos pequeños), por eso la búsqueda lineal es aceptable aquí."""
+    """Menor k>0 tal que a^k ≡ 1 (mod p). Útil solo para el ejemplo didáctico."""
     valor = a % p
     k = 1
     while valor != 1:
@@ -171,9 +146,6 @@ def construir_reloj_real(clave_publica: dict, pasos_a_mostrar: int = 12) -> dict
     posiciones, pero solo con marcas en los primeros `pasos_a_mostrar`
     puntos de la órbita de g (dibujar las p-1 marcas reales no sirve
     visualmente porque p puede ser decenas de miles).
-
-    El frontend debe dibujar el círculo "vacío" (sin decenas de miles de
-    marcas) y resaltar únicamente los puntos que vienen en 'orbita_muestra'.
     """
     p = int(clave_publica["p"])
     g = int(clave_publica["g"])
@@ -192,7 +164,6 @@ def construir_reloj_real(clave_publica: dict, pasos_a_mostrar: int = 12) -> dict
             "punto": _punto_en_circulo(_angulo_para(valor, p)),
         })
 
-    # Punto de la clave pública y = g^x mod p (x es secreto, no se muestra)
     punto_y = {
         "valor": y,
         "angulo": round(_angulo_para(y, p), 2),
@@ -206,8 +177,8 @@ def construir_reloj_real(clave_publica: dict, pasos_a_mostrar: int = 12) -> dict
         "g": g,
         "y": y,
         "pasos_mostrados": pasos_a_mostrar,
-        "orbita_muestra": orbita_muestra,   # primeros N puntos de la órbita real
-        "punto_clave_publica": punto_y,     # dónde cae y en el reloj
+        "orbita_muestra": orbita_muestra,
+        "punto_clave_publica": punto_y,
         "explicacion": (
             f"Este reloj representa (ℤ/{p}ℤ)*, con {phi} posiciones en total. "
             f"Como {phi} es demasiado grande para dibujar cada marca, se muestran "
@@ -217,7 +188,6 @@ def construir_reloj_real(clave_publica: dict, pasos_a_mostrar: int = 12) -> dict
             f"recorriendo las {phi} posiciones sin repetir)."
         ),
     }
-
 
 def construir_reloj_cifrado(password: str, clave_publica: dict, clave_privada: dict = None,
                              max_caracteres: int = 5) -> dict:
@@ -229,12 +199,6 @@ def construir_reloj_cifrado(password: str, clave_publica: dict, clave_privada: d
       - c1 = g^k mod p
       - yk = y^k mod p (secreto compartido efímero)
       - c2 = m * yk mod p
-
-    Solo se procesan hasta `max_caracteres` para no saturar el reloj.
-    Reutiliza encriptar() de elgamal para no duplicar lógica, pero aquí
-    se recalculan los mismos valores para poder ubicarlos en el reloj
-    con su ángulo (encriptar() no expone los ángulos porque no conoce
-    del concepto de "reloj").
     """
     p = int(clave_publica["p"])
     g = int(clave_publica["g"])
@@ -287,13 +251,10 @@ def construir_reloj_cifrado(password: str, clave_publica: dict, clave_privada: d
         ),
     }
 
+# -------------- Interfaz de alto nivel para el router --------------
 
-# ─────────────────────────────────────────────
-# Interfaz de alto nivel para el router
-# ─────────────────────────────────────────────
 
 def generar_datos_reloj(body: dict) -> dict:
-    
     """
     Punto de entrada único para la ruta /reloj.
 
