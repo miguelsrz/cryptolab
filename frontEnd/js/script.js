@@ -41,12 +41,37 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("error").classList.remove("visible");
 
     cargarClaves();
+    
   });
 
   // Enter en el input de password
   document.getElementById("password").addEventListener("keydown", (e) => {
     if (e.key === "Enter") encriptar();
   });
+
+  // ===== MENÚ HAMBURGUESA =====
+  const menuToggle = document.getElementById('menuToggle');
+  const navMenu = document.querySelector('.section-switcher');
+
+  if (menuToggle && navMenu) {
+    console.log('Botón y menú encontrados');
+
+    menuToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      navMenu.classList.toggle('open');
+      console.log('Clases del menú:', navMenu.classList);
+    });
+
+    // Cerrar al hacer clic en un botón
+    navMenu.querySelectorAll('.switch-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        navMenu.classList.remove('open');
+      });
+    });
+  } else {
+    console.warn('No se encontró el botón o el menú');
+  }
+
 });
 
 function mostrarSeccion(seccion) {
